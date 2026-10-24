@@ -1,4 +1,4 @@
-# Salvage Run v0.10
+# Salvage Run v0.11
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -37,7 +37,7 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **4 biomes:** Scrapyard (Magnet Crabs steal scrap, boss Crusher), Foundry (Slag Golems leave fire, boss Forge Warden), Sewer (rat swarms, boss The Rat King), Reactor (Arc Wisps explode, boss Core Prime).
 - **Loot:** chests always drop gear and get one rarity step better every 2 floors. **Sets** only drop in vaults: Scrapper's Rig, Warden's Oath, Ghost Veil and Collector's Regalia (Salvaged only), each with a 2-piece and a 4-piece bonus.
 - **Daily Vault:** same layout, biome and modifiers for everyone each day. Start it from the menu. Your best floor is saved.
-- Vaults are solo for now. Co-op vaults come later.
+- Co-op vaults (Party and Online) arrived in v0.11, see below.
 
 ## Frontier, events & the Base screen (v0.10)
 
@@ -47,6 +47,15 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **BASE screen** (⌂ button, B key, the menu tile, or the hub bar): Upgrades · Gear · Crew · Map in one place, tap to select, paged stash, no long lists. Works in portrait and landscape. The pause screen shows missions in columns with Resume / Base / Quit on top.
 - **Level-up cards** show stacks as pips with NEW, LV x → y or MAXES OUT, so the last level of a perk no longer reads as "already full".
 - Pacing: gadgets are available from the start, companions from rank 2.
+
+## Co-op vaults (v0.11)
+
+- **CO-OP VAULT** in Party (2-4 players, one device) and Online (host + up to 3 guests). Everyone dives into the same seeded vault.
+- A combat room seals only when every living player is inside. Rooms add enemies per extra player; a cleared room heals the team.
+- Downed players respawn in the vault after 3 s; their carried haul drops. A team wipe ends the run and loses the vault loot.
+- EXTRACT and DEEPER resolve only when the whole team stands on the same pad. Everyone banks their own carry. No friendly fire.
+- New modifiers: **SIEGE** (+1 wave per combat room, +25% scrap) and **MIMIC** (a treasure chest wakes 2 elite guards that drop bonus gear).
+- Party and lobby screens use compact mode selectors that fit portrait and landscape without scrolling.
 
 ## Companions & gadgets (v0.9)
 
@@ -72,9 +81,10 @@ Settings → Pages → Deploy from branch → `main` / root. On a free plan the 
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier: regions, gatekeepers, camps, shrines, events) and `n.js` (UI shell: menu, Base screen, hub bar, cards, pause). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier: regions, gatekeepers, camps, shrines, events) and `n.js` (UI shell: menu, Base screen, hub bar, cards, pause) and `o.js` (co-op vaults, Siege and Mimic modifiers, party and lobby mode selectors). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
+- v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
 - v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits

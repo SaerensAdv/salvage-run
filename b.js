@@ -1,5 +1,5 @@
 /* ================= STATE ================= */
-let mode='solo',state='menu',myId=0;
+let mode='solo',state='menu',myId=0,raid=false;
 let players=[],enemies=[],bullets=[],pickups=[],parts=[],texts=[],feed=[],rings=[];
 let time=0,hitstop=0,beacon=null,beaconT=45,bossT=120,dayT=10,eid=0,pid2=0,matchT=0,banners={},shakes={};
 const MATCH_LEN=360;

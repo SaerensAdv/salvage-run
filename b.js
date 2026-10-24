@@ -3,11 +3,11 @@ let mode='solo',state='menu',myId=0,raid=false;
 let players=[],enemies=[],bullets=[],pickups=[],parts=[],texts=[],feed=[],rings=[];
 let time=0,hitstop=0,beacon=null,beaconT=45,bossT=120,dayT=10,eid=0,pid2=0,matchT=0,banners={},shakes={};
 const MATCH_LEN=360;
-const decor=[];for(let i=0;i<900;i++)decor.push({x:rand(0,WORLD),y:rand(0,WORLD),r:rand(5,26),k:Math.random(),a:rand(0,TAU)});
+const decor=[];for(let i=0;i<3400;i++)decor.push({x:rand(0,WORLD),y:rand(0,WORLD),r:rand(5,26),k:Math.random(),a:rand(0,TAU)});
 const crates=[];
-function placeCrate(c){for(let i=0;i<20;i++){const x=rand(80,WORLD-80),y=rand(80,WORLD-80),d=Math.hypot(x-HUB.x,y-HUB.y);if(d<HUB.r+140)continue;
+function placeCrate(c){for(let i=0;i<20;i++){const x=rand(80,WORLD-80),y=rand(80,WORLD-80),d=Math.hypot(x-HUB.x,y-HUB.y);if(d<HUB.r+140||d>3880)continue;
   const t=tierAt(x,y);if(t===1&&Math.random()<.4)continue;c.x=x;c.y=y;c.t=t;break}c.r=17;c.max=c.hp=20*[0,1,2,3.5][c.t];c.dead=0;c.flash=0;c.dirty=true}
-for(let i=0;i<75;i++){const c={i};placeCrate(c);crates.push(c)}
+for(let i=0;i<190;i++){const c={i};placeCrate(c);crates.push(c)}
 const creditsSave=p=>mode==='solo'||mode==='party'||(mode==='host'&&p.id===0);
 const localIds=()=>mode==='guest'?[myId]:players.filter(p=>!p.remote).map(p=>p.id);
 const meP=()=>mode==='guest'?players.find(p=>p.id===myId):players[0];

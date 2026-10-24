@@ -4,15 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#24100a">
-<title>Salvage Run · v0.4</title>
+<title>Salvage Run · v0.5</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
 <!--
-  SALVAGE RUN v0.4 · Saerens game lab
-  Modes: SOLO (offline) · PARTY (2-4 players, one device, split screen, gamepads, offline) · ONLINE (host + up to 3, peer-to-peer via PeerJS)
+  SALVAGE RUN v0.5 · Saerens game lab
+  Modes: SOLO (offline) · PARTY (2-4 players, one device, versus or co-op raid, gamepads, offline) · ONLINE (host + up to 3, free-for-all or co-op raid, peer-to-peer via PeerJS)
+  Meta: mastery ranks, dailies, weekly contract (10 tiers, cosmetic trails, no paid track)
   Pillars: 1) risk you chose (go deeper = more scrap, more danger)
            2) loot you can lose (carried scrap + run build die with you)
            3) the tense exit (walk home or channel a beacon while raiders close in)
@@ -126,8 +127,8 @@
   <div class="chars" id="charPick"></div>
   <div class="modes">
     <button id="go" class="big">SOLO</button>
-    <button id="goParty" class="alt">PARTY<small>2-4 players · one screen · controllers · offline</small></button>
-    <button id="goOnline" class="alt">ONLINE<small>host or join with a code · up to 4</small></button>
+    <button id="goParty" class="alt">PARTY<small>2-4 players · versus or co-op raid · offline</small></button>
+    <button id="goOnline" class="alt">ONLINE<small>free-for-all or co-op raid · up to 4</small></button>
   </div>
   <div id="menuMeta"></div>
   <small>Drag to move · auto-fire · ability button · WASD + Space on desktop</small>
@@ -172,5 +173,6 @@
 <script src="f.js"></script>
 <script src="g.js"></script>
 <script src="h.js"></script>
+<script src="i.js"></script>
 </body>
 </html>

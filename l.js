@@ -22,7 +22,7 @@ const GK=Object.keys(GDEF);
 const CREW_RANK=1,GAD_RANK=0,CREW_MAX=10,CREW_UNLOCK=120;
 let gads=[],crewSig=1,gadSeq=0;
 const crewCost=l=>({s:Math.round(40*Math.pow(1.4,l-1)),c:l>=4?l-2:0});
-const crewOn=()=>(mode==='solo'||(mode==='host'&&raid)||(mode==='guest'&&!!G.raid))&&!ftueOn();
+const crewOn=()=>(mode==='solo'||(mode==='host'&&raid)||(mode==='guest'&&!!G.raid)||(typeof VLT!=='undefined'&&VLT&&VLT.coop&&(mode==='party'||mode==='host'||mode==='guest')))&&!ftueOn();
 function ensureCrew(){let c=save.crew;if(!c||typeof c!=='object')c=save.crew={};
   if(typeof c.unl!=='object'||!c.unl)c.unl={};if(typeof c.lv!=='object'||!c.lv)c.lv={};if(typeof c.gu!=='object'||!c.gu)c.gu={};
   for(const k of Object.keys(c.unl))if(!CDEF[k])delete c.unl[k];for(const k of Object.keys(c.gu))if(!GDEF[k])delete c.gu[k];

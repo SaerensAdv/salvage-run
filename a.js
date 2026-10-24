@@ -6,7 +6,7 @@ let W=0,H=0,DPR=1,Z=1;
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;Z=clamp(Math.min(W,H)/700,.62,1.15)}
 addEventListener('resize',resize);resize();
 
-const WORLD=3600,HUB={x:1800,y:1800,r:170},Z2=700,Z3=1250,MULT=[0,1,2,3];
+const WORLD=8000,HUB={x:4000,y:4000,r:170},Z2=700,Z3=1250,MULT=[0,1,2,3];
 const tierAt=(x,y)=>{const d=Math.hypot(x-HUB.x,y-HUB.y);return d<Z2?1:d<Z3?2:3};
 const inHub=o=>Math.hypot(o.x-HUB.x,o.y-HUB.y)<HUB.r;
 const F=(w,s)=>`${w} ${s}px Sora, system-ui, sans-serif`;

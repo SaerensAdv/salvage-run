@@ -271,8 +271,8 @@ const _dh8=drawHud;drawHud=function(p,W2,H2,Zv,v){const split=views().length>1,m
     if(di.lost>0)txt(`The vault keeps the ${di.lost} scrap you carried, and your hot loot.`,W2/2,H2*.4+66,'#c59bff');
     if(di.perks>0)txt(`Your level ${di.lvl} build (${di.perks} perks) died with you.`,W2/2,H2*.4+92,'rgba(246,231,216,.75)');
     txt(`back in ${Math.ceil(p.dead)}`,W2/2,H2*.4+130,'rgba(246,231,216,.55)');return}
-  if(!VLT){if(rift&&p.dead<=0){edgeArrow(p,W2,H2,Zv,rift.x,rift.y,'#c59bff','RIFT',.9);const sc=ms/WORLD;ctx.fillStyle='#c59bff';ctx.globalAlpha=.6+Math.sin(time*6)*.4;
-      ctx.beginPath();ctx.arc(mx+rift.x*sc,my+rift.y*sc,5,0,TAU);ctx.fill();ctx.globalAlpha=1}return}
+  if(!VLT){if(rift&&p.dead<=0){edgeArrow(p,W2,H2,Zv,rift.x,rift.y,'#c59bff','RIFT',.9);ctx.fillStyle='#c59bff';ctx.globalAlpha=.6+Math.sin(time*6)*.4;
+      ctx.beginPath();ctx.arc(MX(rift.x),MY(rift.y),5,0,TAU);ctx.fill();ctx.globalAlpha=1}return}
   const V=VLT,B=BIOMES[V.biome],x=split?10:14,y=split?10:14;
   ctx.fillStyle='#1d0a05';ctx.fillRect(x+8,y+121,186,32);ctx.textAlign='left';ctx.font=F(600,14);ctx.fillStyle=B.acc;
   ctx.fillText(`${V.daily?'DAILY ':''}VAULT · F${V.depth}${V.mod?' · '+MODS[V.mod][0]:''}`,x+14,y+136);const h=heat(p);bar(x+14,y+145,172,5,h,h>=1?'#ff5a3c':'#e67424','#3c0d03');
@@ -293,8 +293,8 @@ const _dh8=drawHud;drawHud=function(p,W2,H2,Zv,v){const split=views().length>1,m
 (()=>{const md=$('menu')&&$('menu').querySelector('.modes');if(md){const b=document.createElement('button');b.className='alt';b.id='goVault';b.innerHTML='DAILY VAULT<small id="vaultSub"></small>';
     b.addEventListener('click',startDailyVault);md.appendChild(b)}})();
 const _mm8=menuMeta;menuMeta=function(){_mm8();ensureVault();const b=$('goVault'),s=$('vaultSub'),V=save.vault,d=V.daily&&V.daily.d===today()?V.daily:{best:0,haul:0};
-  if(b)b.style.display=save.ftue>=5?'':'none';if(s)s.textContent=`same vault for everyone today · your best: floor ${d.best}${d.haul?' · '+d.haul+' banked':''} · deepest ever ${V.best}`};
-ensureVault();menuMeta();document.title='Salvage Run · v0.8';
+  if(b)b.style.display=save.ftue>=5?'':'none';if(s)s.textContent=`same seed for all · best floor ${d.best}`};
+ensureVault();menuMeta();document.title='Salvage Run · v0.10';
 if(window.__game)Object.defineProperties(window.__game,Object.getOwnPropertyDescriptors({update,enterVault,endVault,vaultPath,startDailyVault,setCounts,shiftW,genFloor,
   get VLT(){return VLT},get rift(){return rift},set riftT(v){riftT=v},get crates(){return crates},get pickups(){return pickups},vcell,makeItem,itemPower,gearTotals,
   get wloot(){return wloot},get gearHtml(){return gearEl.innerHTML}}));

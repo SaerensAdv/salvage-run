@@ -1,4 +1,4 @@
-# Salvage Run v0.9
+# Salvage Run v0.10
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -39,12 +39,21 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Daily Vault:** same layout, biome and modifiers for everyone each day. Start it from the menu. Your best floor is saved.
 - Vaults are solo for now. Co-op vaults come later.
 
+## Frontier, events & the Base screen (v0.10)
+
+- **Bigger world in 4 rings:** Scrap Plains → Rust Flats → Slag Fields → Dead Reactor. You start in the Plains. Each ring is locked behind a **Gatekeeper** at its gate (Rustjaw, The Foreman, Core Tyrant): stand on the gate to wake it, beat it to open the next ring. Deeper rings: tougher monsters, more scrap, gear shifted up a rarity step and +4 iLvl per ring. Once a gate is open the Gatekeeper returns every 4 minutes for a loot rematch.
+- **Region monsters:** Magnet Crabs steal from your bag (kill them to get it back), Slag Golems leave burning ground, Arc Wisps explode when they die.
+- **Always something to do:** raider camps (clear them for a chest, back after 2.5 min), shrines (30 s buff: Fury, Swift, Magnet, Fortune) and a world event every 50-70 s (Supply Drop, Loot Goblin, Horde, Scrap Storm). Arrows and the minimap point you there.
+- **BASE screen** (⌂ button, B key, the menu tile, or the hub bar): Upgrades · Gear · Crew · Map in one place, tap to select, paged stash, no long lists. Works in portrait and landscape. The pause screen shows missions in columns with Resume / Base / Quit on top.
+- **Level-up cards** show stacks as pips with NEW, LV x → y or MAXES OUT, so the last level of a perk no longer reads as "already full".
+- Pacing: gadgets are available from the start, companions from rank 2.
+
 ## Companions & gadgets (v0.9)
 
-- **One companion** (CREW screen, ✦ or menu). Unlocks at rank 3, the Turret drone is free; others cost 120 safe scrap. Feed them scrap (and cores from Lv 4) up to Lv 10.
+- **One companion** (Base → Crew). Unlocks at rank 2, the Turret drone is free; others cost 120 safe scrap. Feed them scrap (and cores from Lv 4) up to Lv 10.
 - **Drones** float and never die: Turret (shoots), Medic (heals out of combat), Magnet (pulls scrap), Aegis (blocks a hit every few seconds), Scout (arrows to elites, chests, rifts, +scrap).
 - **Minions** walk and can be downed (back in 20 s): Scrap Rat (fetches loose scrap, runs one hot item home; in vaults it only secures on extract, and you still lose it if you die), Hound (bites, barks to taunt), Golem (tank, taunts, blocks raider shots, slams).
-- **Gadgets** unlock at rank 2: 2 slots with charges on Q / E, LB / RB or the two round buttons. Grenade, Medkit (free), Mine, Smoke, Decoy. Charges refill when you bank, respawn or enter a vault (+1 per deeper floor). Grenade: 3, Medkit: 2, Mine: 3 (80 scrap), Smoke: 2 (100), Decoy: 2 (120).
+- **Gadgets** are available from the start: 2 slots with charges on Q / E, LB / RB or the two round buttons. Grenade, Medkit (free), Mine, Smoke, Decoy. Charges refill when you bank, respawn or enter a vault (+1 per deeper floor). Grenade: 3, Medkit: 2, Mine: 3 (80 scrap), Smoke: 2 (100), Decoy: 2 (120).
 - **Where it counts:** Solo, vaults and Co-op raids (host simulates, guests send their loadout). Party and online free-for-all stay pure skill. Monsters scale a little with companion level.
 - Fix: buying upgrades or swapping gear no longer cuts your hp to the pre-gear max.
 
@@ -63,10 +72,10 @@ Settings → Pages → Deploy from branch → `main` / root. On a free plan the 
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier: regions, gatekeepers, camps, shrines, events) and `n.js` (UI shell: menu, Base screen, hub bar, cards, pause). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
-- v0.9 validation: 47 companion/gadget unit checks and 10 simulated network checks passed; party, FFA, raid and weekly regressions were exercised. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
+- v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits
 

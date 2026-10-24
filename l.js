@@ -19,7 +19,7 @@ const GDEF={
   smoke:{n:'Smoke',ic:'☁',col:'#c9c2bd',max:2,cost:100,d:'5 s cloud · monsters slow, half their hits miss'},
   decoy:{n:'Decoy',ic:'◎',col:'#c9bfff',max:2,cost:120,d:'Pulls monsters for 6 s, then pops'}};
 const GK=Object.keys(GDEF);
-const CREW_RANK=2,GAD_RANK=1,CREW_MAX=10,CREW_UNLOCK=120;
+const CREW_RANK=1,GAD_RANK=0,CREW_MAX=10,CREW_UNLOCK=120;
 let gads=[],crewSig=1,gadSeq=0;
 const crewCost=l=>({s:Math.round(40*Math.pow(1.4,l-1)),c:l>=4?l-2:0});
 const crewOn=()=>(mode==='solo'||(mode==='host'&&raid)||(mode==='guest'&&!!G.raid))&&!ftueOn();
@@ -42,6 +42,8 @@ function refillGad(p,amt){if(!p.crew)return false;let ch=false;p.gch=p.gch||[0,0
   for(let i=0;i<2;i++){const k=p.crew.g[i],m=gadMax(k),v=amt==null?m:Math.min(m,p.gch[i]+amt);if(v!==p.gch[i]){p.gch[i]=v;ch=true}}return ch}
 function setCrew(p,c){const old=p.crew;p.crew=c;if(!old||old.g[0]!==c.g[0]||old.g[1]!==c.g[1]){p.gch=[0,0];refillGad(p)}
   if(p.cm&&p.cm.type!==c.sel)p.cm=null;recalc(p)}
+
+/* ---------- companion entity ---------- */
 function mkCm(p){const t=p.crew.sel,D=CDEF[t],lv=crewLv(p),m=D.hp?Math.round(D.hp(lv)*(1+.05*(p.run.lvl-1))):1;
   return{type:t,x:p.x+30,y:p.y+24,hp:m,max:m,r:t==='golem'?18:t==='hound'?13:t==='rat'?9:9,down:0,cd:0,bark:4,taunt:0,sc:0,bag:null,trip:false,tt:0,grab:0,hide:false,ang:rand(0,TAU),slam:2}}
 const isMinion=cm=>cm&&CDEF[cm.type].k==='minion';
@@ -54,6 +56,7 @@ function deliverItem(p,it){if(p.remote)netSend(p,{t:'item',it});else addToStash(
 const notTauntable=e=>e.dead||e.type==='boss'||e.type==='collector'||e.prime||e.bossV;
 function nearFoe(x,y,R,skip){let b=null,bd=R*R;for(const e of enemies){if(e.dead||(skip&&skip(e)))continue;const d=(e.x-x)**2+(e.y-y)**2;if(d<bd){bd=d;b=e}}return b}
 function stepTo(o,tx,ty,sp,dt){const dx=tx-o.x,dy=ty-o.y,d=Math.hypot(dx,dy);if(d<2)return d;const s=Math.min(d,sp*dt);o.x+=dx/d*s;o.y+=dy/d*s;return d}
+
 function tickCm(p,dt){const cm=p.cm,D=CDEF[cm.type],lv=crewLv(p);cm.cd-=dt;
   if(p.dead>0&&!cm.trip){cm.hide=true;return}
   if(cm.hide&&!cm.trip)cmHome(p,cm);
@@ -67,6 +70,7 @@ function tickCm(p,dt){const cm=p.cm,D=CDEF[cm.type],lv=crewLv(p);cm.cd-=dt;
       for(const q of pickups){if(q.age>=999||q.age<.25)continue;if(q.k==='s'&&!room)continue;const dx=p.x-q.x,dy=p.y-q.y,d=Math.hypot(dx,dy);
         if(d<R&&d>p.mag*.6){q.x+=dx/d*520*dt;q.y+=dy/d*520*dt}}}
     return}
+  // minions
   if(cm.down>0){cm.down-=dt;cm.hide=true;if(cm.down<=0){const n=mkCm(p);Object.assign(cm,n);cmHome(p,cm);feedTo(p,`${D.n} is back`,D.col)}return}
   if(inHub(p)&&!cm.trip)cm.hp=cm.max;
   if(!cm.trip&&Math.hypot(cm.x-p.x,cm.y-p.y)>750)cmHome(p,cm);
@@ -92,6 +96,7 @@ function tickCm(p,dt){const cm=p.cm,D=CDEF[cm.type],lv=crewLv(p);cm.cd-=dt;
     if(cm.slam<=0&&enemies.some(o=>!o.dead&&Math.hypot(o.x-cm.x,o.y-cm.y)<80+o.r)){cm.slam=3;fxRing(cm.x,cm.y,80,'#9aa7b0',.3);
       for(const o of enemies)if(!o.dead&&Math.hypot(o.x-cm.x,o.y-cm.y)<80+o.r)hitEnemy(o,p.dmg*(.9+.12*lv),p)}
     if(VLT)vpush(cm)}}
+
 function taunters(){const T=[];for(const p of players){const cm=p.cm;if(!p.crew||!cm||cm.hide||cm.down>0||p.dead>0)continue;const lv=crewLv(p);
     if(cm.type==='golem')T.push({x:cm.x,y:cm.y,r:cm.r,R:140+6*lv,o:cm,p});
     else if(cm.type==='hound'&&cm.taunt>0)T.push({x:cm.x,y:cm.y,r:cm.r,R:230,o:cm,p});
@@ -99,6 +104,8 @@ function taunters(){const T=[];for(const p of players){const cm=p.cm;if(!p.crew|
   for(const g of gads)if(g.k==='dc')T.push({x:g.x,y:g.y,r:14,R:420,o:g,p:g.own});return T}
 function hurtTaunter(t,dmg){const o=t.o;if(o.k==='dc'){o.hp-=dmg;fxText(o.x,o.y-20,Math.round(dmg),'#c9bfff',13);return}
   dmg*=o.type==='golem'?.6:1;o.hp-=dmg;fxText(o.x,o.y-22,'-'+Math.round(dmg),'#ff9f6a',13);if(o.hp<=0)downCm(t.p,o)}
+
+/* ---------- gadgets ---------- */
 function blast(p,x,y,R,dmg,col){fxRing(x,y,R,col,.4);fxBurst(x,y,col,26,300);shk(p,9);snd(p,90,.3,'sawtooth',.06,.4);vb(p,[30,20,40]);
   for(const e of enemies)if(!e.dead&&Math.hypot(e.x-x,e.y-y)<R+e.r)hitEnemy(e,dmg,p);
   for(const r of rivals)if(r.dead<=0&&!inHub(r)&&Math.hypot(r.x-x,r.y-y)<R+r.r)hitRival(r,dmg,p);
@@ -121,12 +128,15 @@ function gadTick(dt){for(const g of gads){g.t+=dt;const p=g.own;
     else if(g.k==='sm'){if(g.t>g.life)g.dead=true}
     else if(g.k==='dc'){if(g.t>g.life||g.hp<=0){g.dead=true;blast(p,g.x,g.y,110,p.dmg*3,'#c9bfff')}}}
   gads=gads.filter(g=>!g.dead&&players.includes(g.own))}
+
 function crewTick(dt){const on=crewOn();
   if(mode==='solo'||mode==='host'){const L=on?localCrew():null;for(const p of players)if(!p.remote&&p.crewSig!==crewSig+(on?0:.5)){p.crewSig=crewSig+(on?0:.5);if(L)setCrew(p,L);else{p.crew=null;p.cm=null;recalc(p)}}}
   if(!on){if(gads.length)gads=[];return}
   for(const p of players){if(!p.crew)continue;p.gcd=(p.gcd||0)-dt;if(p.crew.sel){if(!p.cm)p.cm=mkCm(p);tickCm(p,dt)}else p.cm=null}
   gadTick(dt);
   for(const r of rivals)if(r.aggroP&&inSmoke(r.aggroP)){r.aggro=0;r.aggroP=null}}
+
+/* ---------- engine hooks ---------- */
 const _up9=update;update=function(rdt){_up9(rdt);if(state==='play'||state==='pick')crewTick(hitstop>0?rdt*.15:rdt)};
 const _uen9=updateEnemies;updateEnemies=function(dt){if(!crewOn())return _uen9(dt);for(const e of enemies){e._px=e.x;e._py=e.y}_uen9(dt);
   const T=taunters(),S=gads.filter(g=>g.k==='sm');if(!T.length&&!S.length)return;
@@ -143,6 +153,7 @@ const _hp9=hitPlayer;hitPlayer=function(p,dmg,by){if(p.dead>0||p.inv>0||inHub(p)
   if(by&&by.type&&inSmoke(p)&&Math.random()<.5){fxText(p.x,p.y-30,'MISS','#c9c2bd',15);p.inv=.15;return}
   const cm=p.crew&&p.cm;if(cm&&cm.type==='aegis'&&cm.cd<=0){cm.cd=7.5-.4*crewLv(p);p.inv=.3;fxRing(p.x,p.y,46,'#c9bfff',.3);snd(p,1300,.08,'sine',.05,.5);return}
   const h=p.hp;_hp9(p,dmg,by);if(p.hp<h)p.lastHurt=time};
+// fix (since v0.7): base recalc clamped hp to the pre-gear max before gear hp was added, so buying or swapping gear could cut hp
 const _rc9=recalc;recalc=function(p){const h=p.hp;_rc9(p);if(Number.isFinite(h))p.hp=Math.min(h,p.maxHp);if(p.crew&&p.crew.sel&&crewOn()){p.gs=(p.gs||0)+1.5*crewLv(p);if(p.crew.sel==='scout')p.scrapF=(p.scrapF||0)+.015*crewLv(p)}};
 const _fb9=finishBank;finishBank=function(p,h,v){_fb9(p,h,v);if(crewOn()&&refillGad(p))fxText(p.x,p.y-70,'GADGETS REFILLED','#8fd6ff',15)};
 const _rs9=respawn;respawn=function(p){_rs9(p);if(p.crew)refillGad(p);if(p.cm&&isMinion(p.cm)&&!p.cm.trip)cmHome(p,p.cm)};
@@ -155,13 +166,17 @@ const _sw9=setupWorld;setupWorld=function(m,pl){_sw9(m,pl);gads=[];for(const p o
 const _btm9=backToMenu;backToMenu=function(){gads=[];_btm9()};
 const _ru9=rankUp;rankUp=function(){const r=save.rank;_ru9();ensureCrew();
   if(r<GAD_RANK&&save.rank>=GAD_RANK)pushFeedLocal('Gadgets unlocked · Grenade + Medkit on Q / E','#8fd6ff');
-  if(r<CREW_RANK&&save.rank>=CREW_RANK)pushFeedLocal('Companions unlocked · your Turret drone is live. Open CREW (✦)','#8fd6ff');bumpCrew()};
+  if(r<CREW_RANK&&save.rank>=CREW_RANK)pushFeedLocal('Companions unlocked · your Turret drone is live. Open BASE (⌂) → Crew','#8fd6ff');bumpCrew()};
+
+/* ---------- account actions (CREW screen) ---------- */
 function crewUnlock(k){const c=ensureCrew();if(!CDEF[k]||c.unl[k]||save.rank<CREW_RANK||save.bank<CREW_UNLOCK)return false;save.bank-=CREW_UNLOCK;c.unl[k]=1;if(!c.sel)c.sel=k;bumpCrew();refreshShop();return true}
 function crewSel(k){const c=ensureCrew();if(k!==null&&(!CDEF[k]||!c.unl[k]))return false;c.sel=k;bumpCrew();return true}
 function crewFeed(k){const c=ensureCrew();if(!c.unl[k])return false;const l=c.lv[k];if(l>=CREW_MAX)return false;const q=crewCost(l);
   if(save.bank<q.s||(save.cores||0)<q.c)return false;save.bank-=q.s;save.cores=(save.cores||0)-q.c;c.lv[k]=l+1;bumpCrew();refreshShop();return true}
 function gadUnlock(k){const c=ensureCrew();if(!GDEF[k]||gadOwned(k)||save.rank<GAD_RANK||save.bank<GDEF[k].cost)return false;save.bank-=GDEF[k].cost;c.gu[k]=1;bumpCrew();refreshShop();return true}
 function gadSlot(k,i){const c=ensureCrew();if(!gadOwned(k)||save.rank<GAD_RANK||(i!==0&&i!==1))return false;if(c.g[1-i]===k)c.g[1-i]=c.g[i];c.g[i]=k;bumpCrew();return true}
+
+/* ---------- network (Co-op raid: host simulates, guests send loadout + gadget presses) ---------- */
 const _ho9=hostOnData;hostOnData=function(conn,d){const p=d&&players.find(q=>q.id===conn.pid);
   if(d&&d.t==='crew'){if(!p)return;const sel=CDEF[d.sel]?d.sel:null,g=[0,1].map(i=>Array.isArray(d.g)&&GDEF[d.g[i]]?d.g[i]:null);if(g[0]&&g[0]===g[1])g[1]=null;
     setCrew(p,{sel,lv:clamp(d.lv|0,1,CREW_MAX),g});return}
@@ -178,6 +193,8 @@ const _go9=guestOnData;guestOnData=function(d){_go9(d);if(d&&(d.t==='welcome'||d
 let gadSent=0;
 function gadFor(i){if(mode==='guest'){if(!crewOn()||state!=='play'||time-gadSent<.3)return;gadSent=time;netSendHost({t:'gad',i});return}
   const p=players.find(q=>!q.remote);if(p)useGadget(p,i)}
+
+/* ---------- input: Q / E, LB / RB, two touch buttons ---------- */
 addEventListener('keydown',e=>{const k=(e.key||'').toLowerCase();if(e.target&&e.target.tagName==='INPUT'||mode==='party')return;if(k==='q')gadFor(0);if(k==='e')gadFor(1)});
 const gst9=document.createElement('style');gst9.textContent=`.gad{position:fixed;width:62px;height:62px;border-radius:50%;border:3px solid #8fd6ff;display:none;background:rgba(60,13,3,.85);box-shadow:0 4px 0 #170804;padding:0;color:#f6e7d8;font:800 18px Sora,system-ui,sans-serif;line-height:1}
 .gad small{display:block;font-size:13px;margin-top:2px}.gad:active{transform:translateY(3px)}#gad0{right:118px;bottom:30px}#gad1{right:30px;bottom:124px}
@@ -191,6 +208,8 @@ const _ut9=uiTick;uiTick=function(){_ut9();const playing=state==='play'||state==
   const L=mode==='guest'?localCrew():me&&me.crew,ch=mode==='guest'?(G.gch||[0,0]):(me&&me.gch)||[0,0];
   gadEls.forEach((b,i)=>{const k=L&&L.g[i];if(!playing||mode==='party'||!crewOn()||!k||!me||me.dead>0||inHub(me)){b.style.display='none';return}
     const D=GDEF[k];b.style.display='block';b.style.borderColor=D.col;b.style.opacity=ch[i]>0?1:.45;b.innerHTML=`${D.ic}<small>${ch[i]}</small>`})};
+
+/* ---------- CREW screen ---------- */
 const crewEl=document.createElement('div');crewEl.id='crew';crewEl.className='sub';document.body.appendChild(crewEl);let crewWasPlay=false;
 function refreshCrewUI(){if(crewEl.style.display!=='flex')return;const c=ensureCrew(),ok=canSwap(),R=save.rank;
   let h=`<h2>CREW</h2><div style="opacity:.75;font-size:14px;max-width:440px">One companion, two gadgets. They count in Solo, vaults and Co-op raids. Party and free-for-all stay pure skill.${ok?'':' · Changes only in the hub.'}</div>`;
@@ -223,6 +242,8 @@ function closeCrew(){crewEl.style.display='none';if(crewWasPlay&&state==='pause'
 const _mm9=menuMeta;menuMeta=function(){_mm9();const c=ensureCrew(),s=$('crewSub');if(!s)return;
   s.textContent=save.rank<GAD_RANK?`gadgets at rank ${GAD_RANK+1}`:save.rank<CREW_RANK?`companions at rank ${CREW_RANK+1}`:c.sel?`${CDEF[c.sel].n} Lv ${c.lv[c.sel]} · ${c.g.filter(Boolean).map(k=>GDEF[k].n).join(' + ')}`:'pick a companion'};
 const _up9b=update;update=function(rdt){_up9b(rdt);const cb=$('crewBtn');if(cb)cb.style.display=mode==='party'||(mode==='host'&&!raid)?'none':''};
+
+/* ---------- render (deliberately simple) ---------- */
 function drawCm(x,y,type,hpf,bag,taunt){const D=CDEF[type];if(!D)return;ctx.save();ctx.translate(x,y);
   if(D.k==='drone'){const b=Math.sin(time*4+x*.01)*3;ctx.fillStyle='rgba(23,8,4,.35)';ctx.beginPath();ctx.ellipse(0,26,8,3,0,0,TAU);ctx.fill();ctx.translate(0,b);
     ctx.fillStyle=D.col;ctx.strokeStyle='#170804';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,9,0,TAU);ctx.fill();ctx.stroke();
@@ -258,6 +279,7 @@ const _dh9=drawHud;drawHud=function(p,W2,H2,Zv,v){if(crewOn()&&p.cx!=null){const
     if(rift&&!VLT)edgeArrow(p,W2,H2,Zv,rift.x,rift.y,'#b57cff','RIFT',.9)}
   if(crewOn()&&p.dead<=0){const c=mode==='guest'?null:p.cm;if(c&&isMinion(c)&&c.down>0){ctx.font=F(700,14);ctx.textAlign='center';txt(`${CDEF[c.type].n} back in ${Math.ceil(c.down)} s`,W2/2,H2-(views().length>1?20:130),'#ff9f6a')}
     if(c&&c.trip){ctx.font=F(700,14);ctx.textAlign='center';txt(VLT?`Rat carries ${c.bag?c.bag.name:'loot'} · extract to secure`:`Rat is running ${c.bag?c.bag.name:'loot'} home`,W2/2,H2-(views().length>1?38:148),'#c58b5a')}}};
+
 if(window.__game)Object.defineProperties(window.__game,Object.getOwnPropertyDescriptors({update,crewTick,useGadget,gadFor,crewUnlock,crewSel,crewFeed,gadUnlock,gadSlot,crewCost,ensureCrew,localCrew,
   openCrew,closeCrew,refreshCrewUI,recalc,enterVault,endVault,startDailyVault,vExtract,killPlayer,hitPlayer,updateEnemies,taunters,inSmoke,CDEF,GDEF,
   get gads(){return gads},get bullets(){return bullets},set gads(v){gads=v},get crewHtml(){return crewEl.innerHTML},get crewSig(){return crewSig}}));

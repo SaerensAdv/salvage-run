@@ -1,4 +1,4 @@
-# Salvage Run v0.8
+# Salvage Run v0.9
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -39,6 +39,15 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Daily Vault:** same layout, biome and modifiers for everyone each day. Start it from the menu. Your best floor is saved.
 - Vaults are solo for now. Co-op vaults come later.
 
+## Companions & gadgets (v0.9)
+
+- **One companion** (CREW screen, ✦ or menu). Unlocks at rank 3, the Turret drone is free; others cost 120 safe scrap. Feed them scrap (and cores from Lv 4) up to Lv 10.
+- **Drones** float and never die: Turret (shoots), Medic (heals out of combat), Magnet (pulls scrap), Aegis (blocks a hit every few seconds), Scout (arrows to elites, chests, rifts, +scrap).
+- **Minions** walk and can be downed (back in 20 s): Scrap Rat (fetches loose scrap, runs one hot item home; in vaults it only secures on extract, and you still lose it if you die), Hound (bites, barks to taunt), Golem (tank, taunts, blocks raider shots, slams).
+- **Gadgets** unlock at rank 2: 2 slots with charges on Q / E, LB / RB or the two round buttons. Grenade, Medkit (free), Mine, Smoke, Decoy. Charges refill when you bank, respawn or enter a vault (+1 per deeper floor). Grenade: 3, Medkit: 2, Mine: 3 (80 scrap), Smoke: 2 (100), Decoy: 2 (120).
+- **Where it counts:** Solo, vaults and Co-op raids (host simulates, guests send their loadout). Party and online free-for-all stay pure skill. Monsters scale a little with companion level.
+- Fix: buying upgrades or swapping gear no longer cuts your hp to the pre-gear max.
+
 ## Weekly contract
 
 Every Monday a new contract: 10 tiers, earned with ★ from banking (1 per 15 scrap), 4 weekly goals, 1 co-op goal, daily chests and rank-ups. Rewards are safe scrap and cosmetic trails. Trails stay yours, every trail returns in later contracts, and after tier 10 overtime keeps paying. No paid track, nothing you can buy.
@@ -50,6 +59,14 @@ Some carriers block direct peer-to-peer. Fix: create a free Metered account (20 
 ## Hosting on GitHub Pages
 
 Settings → Pages → Deploy from branch → `main` / root. On a free plan the repo must be public for Pages.
+
+## Development & QA
+
+- Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets). Keep game logic separate from drawing so a later visual remake can reuse it.
+- `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
+- Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
+- v0.9 validation: 47 companion/gadget unit checks and 10 simulated network checks passed; party, FFA, raid and weekly regressions were exercised. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits
 

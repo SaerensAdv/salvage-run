@@ -1,4 +1,4 @@
-# Salvage Run v0.5
+# Salvage Run v0.6
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -17,6 +17,14 @@ Grab scrap. Get out alive. Bank it before someone takes it.
   - Keyboard: P1 WASD + Space · P2 arrows + Enter · P3 IJKL + O · P4 numpad 8456 + 0
   - Controllers: plug in or pair up to 4 gamepads. Stick or d-pad moves, A = ability, X / Y / B pick perk cards 1 / 2 / 3. In Solo, Start pauses and A on the main menu starts a run.
 - **Online:** the host's device runs the world. Guests send input and receive snapshots 15 times per second. Peers find each other through the free PeerJS signaling server; game data then flows peer-to-peer (WebRTC). Controllers work for guests too.
+
+## Gear (v0.6)
+
+- **4 slots:** weapon, armor, boots, backpack. **3 rarities:** Common (grey), Uncommon (green), Rare (blue). Every item has an item level, a base type and 1-3 bonus stats.
+- **Weapons change how you fire:** Blaster (steady), Scattergun (3 pellets, short range), Rail (slow, heavy, pierces), Burst SMG (fast, sprays).
+- **Hot loot:** found gear is hot until you bank it in the hub or at a beacon. Die and it drops where you fell. Equipped gear is always safe. Max 3 hot items at once.
+- **GEAR screen** (◈ in a run, or GEAR in the menu): compare, equip (only in the hub or the menu) and scrap items. Drop odds are visible, and a Rare is guaranteed within 15 drops.
+- **Where gear counts:** Solo and Co-op raids use full gear. Online free-for-all keeps your weapon type but evens out the stats. Party on one device plays without gear. Monsters scale a little with your gear score.
 
 ## Weekly contract
 

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#24100a">
+<title>Salvage Run · v0.3</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<!--
+  SALVAGE RUN v0.3 · Saerens game lab
+  Modes: SOLO (offline) · PARTY (2 players, one device, split screen, offline) · ONLINE (host + up to 3, peer-to-peer via PeerJS)
+  Pillars: 1) risk you chose (go deeper = more scrap, more danger)
+           2) loot you can lose (carried scrap + run build die with you)
+           3) the tense exit (walk home or channel a beacon while raiders close in)
+  Loops: moment (dodge/dash) → encounter (monsters, crates, raiders) → trip (bank or die)
+         → run build (1-of-3 perks) → meta (upgrades, mastery ranks, daily missions)
+  Ethics: no energy, no paid power, no fake timers, missed days pause the streak.
+-->
+<style>
+  :root{--bg:#24100a;--ink:#f6e7d8;--ember:#e67424;--scrap:#ed9b49;--gold:#f5c34d;--blood:#8d1c06;--deep:#3c0d03;--soot:#170804}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
+    font-family:Sora,system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+  canvas{display:block;width:100vw;height:100vh}
+  button{font-family:Sora,system-ui,sans-serif;color:var(--ink);cursor:pointer}
+  .ov{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center}
+  #menu{display:flex;background:radial-gradient(circle at 50% 45%,rgba(36,16,10,.3),rgba(23,8,4,.94) 70%)}
+  #menu h1{margin:0;font-weight:800;font-size:clamp(64px,16vw,150px);line-height:.82;letter-spacing:-.04em;color:var(--gold);
+    text-shadow:0 6px 0 var(--blood),0 12px 40px rgba(230,116,36,.45)}
+  #menu h1 span{display:block;color:var(--ink);font-size:.62em;letter-spacing:.18em;text-shadow:0 5px 0 var(--deep)}
+  #menu p{margin:0;font-size:18px;max-width:340px;opacity:.85}
+  .big{font:800 22px Sora,system-ui,sans-serif;letter-spacing:.08em;color:var(--deep)!important;background:var(--gold);border:0;border-radius:14px;
+    padding:16px 40px;box-shadow:0 6px 0 var(--blood)}
+  .big:active{transform:translateY(4px);box-shadow:0 2px 0 var(--blood)}
+  #menuMeta{font-size:15px;opacity:.75;line-height:1.5}
+  #menu small{font-size:14px;opacity:.55}
+  #reset{font-size:14px;opacity:.35;text-decoration:underline;cursor:pointer}
+  #hudBtns{position:fixed;left:14px;top:178px;display:none;gap:8px}
+  #hudBtns button{width:44px;height:44px;border-radius:12px;border:0;background:rgba(23,8,4,.62);font-size:20px}
+
+  #dash,#dash2{position:fixed;width:84px;height:84px;border-radius:50%;border:3px solid var(--gold);display:none;
+    font-weight:800;font-size:14px;letter-spacing:.06em;background:rgba(60,13,3,.85);box-shadow:0 5px 0 var(--soot);padding:0}
+  #dash{right:22px;bottom:26px}
+  #dash2{left:22px;bottom:26px;border-color:#ff9fd0}
+  #dash:active,#dash2:active{transform:translateY(3px)}
+  .modes{display:flex;flex-direction:column;gap:10px;width:min(86vw,320px)}
+  .modes .big{width:100%}
+  .alt{font:800 18px Sora,system-ui,sans-serif;letter-spacing:.08em;background:rgba(60,13,3,.9);border:2px solid var(--scrap);border-radius:14px;padding:13px 20px;box-shadow:0 5px 0 var(--soot)}
+  .alt small{display:block;font-size:14px;font-weight:600;letter-spacing:0;opacity:.6;margin-top:2px}
+  .alt:active{transform:translateY(3px)}
+  .chars{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .chars button{width:104px;padding:10px 6px;border-radius:12px;border:2px solid #5a2a1a;background:rgba(60,13,3,.8);display:flex;flex-direction:column;gap:3px;align-items:center}
+  .chars button b{font-size:15px}.chars button span{font-size:14px;opacity:.65}
+  .chars button.on{border-color:var(--gold);box-shadow:0 0 18px rgba(245,195,77,.35)}.chars button.lock{opacity:.3}
+  .sub{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center;background:rgba(23,8,4,.94);overflow-y:auto;touch-action:pan-y}
+  .sub h2{margin:0;font-size:clamp(30px,7vw,48px);font-weight:800;color:var(--gold);letter-spacing:-.02em;text-shadow:0 4px 0 var(--blood)}
+  .sub p{margin:0;max-width:380px;font-size:16px;opacity:.8;line-height:1.45}
+  .pcol{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+  .pcol>div{display:flex;flex-direction:column;gap:10px;align-items:center;background:rgba(60,13,3,.55);border-radius:16px;padding:14px}
+  .pcol h3{margin:0;font-size:18px}
+  .code{font-size:clamp(44px,12vw,72px);font-weight:800;letter-spacing:.18em;color:var(--ink);background:rgba(60,13,3,.8);border-radius:16px;padding:6px 18px 6px 28px}
+  input.codein{font:800 32px Sora,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;width:min(80vw,260px);text-align:center;
+    background:#2b0f08;color:var(--ink);border:2px solid var(--scrap);border-radius:12px;padding:10px;touch-action:auto;user-select:text;-webkit-user-select:text}
+  input.namein{font:600 18px Sora,system-ui,sans-serif;width:min(80vw,260px);text-align:center;background:#2b0f08;color:var(--ink);border:2px solid #5a2a1a;border-radius:12px;padding:10px;touch-action:auto;user-select:text;-webkit-user-select:text}
+  .row2{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .link{font-size:15px;opacity:.6;text-decoration:underline;background:none;border:0}
+  #lobbyList{font-size:16px;line-height:1.7}
+  .badge{display:inline-block;font-size:14px;font-weight:600;letter-spacing:.1em;color:var(--deep);background:var(--scrap);border-radius:8px;padding:2px 8px;margin-left:6px}
+  #shop{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:8px;width:min(96vw,430px)}
+  #shop .t{font-size:14px;font-weight:600;letter-spacing:.12em;color:var(--gold);text-shadow:0 2px 0 var(--deep)}
+  #shop .row{display:flex;gap:6px;width:100%;justify-content:center}
+  #shop button{flex:1;max-width:84px;padding:9px 2px 8px;border-radius:12px;border:2px solid var(--scrap);background:rgba(60,13,3,.94);
+    display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 4px 0 var(--soot)}
+  #shop button b{font-size:14px;font-weight:800}
+  #shop button i{font-style:normal;font-size:14px;opacity:.65}
+  #shop button span{font-size:14px;font-weight:800;color:var(--gold)}
+  #shop button.no{border-color:#5a2a1a;opacity:.5}
+  #shop button.max{border-color:var(--gold);opacity:.8}
+  #shop button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--soot)}
+  #pick{background:rgba(23,8,4,.78)}
+  #pick .pt{font-size:clamp(34px,8vw,60px);font-weight:800;color:var(--gold);letter-spacing:-.02em;text-shadow:0 5px 0 var(--blood)}
+  #pick .ps{font-size:16px;opacity:.75;margin-top:-10px}
+  #pick .cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .card{width:180px;min-height:200px;border-radius:18px;border:3px solid var(--ink);background:#2b0f08;padding:18px 14px;display:flex;flex-direction:column;
+    gap:10px;align-items:center;justify-content:center;box-shadow:0 6px 0 var(--soot);animation:deal .35s cubic-bezier(.2,1.4,.4,1) both}
+  .card:nth-child(2){animation-delay:.07s}.card:nth-child(3){animation-delay:.14s}
+  .card .rar{font-size:14px;font-weight:600;letter-spacing:.14em}
+  .card b{font-size:20px;font-weight:800;line-height:1.1}
+  .card p{margin:0;font-size:15px;opacity:.85;line-height:1.35}
+  .card .stk{font-size:14px;opacity:.6}
+  .card.r1{border-color:var(--scrap)}.card.r1 .rar{color:var(--scrap)}
+  .card.r2{border-color:var(--gold);box-shadow:0 6px 0 var(--soot),0 0 34px rgba(245,195,77,.45)}.card.r2 .rar{color:var(--gold)}
+  .card:active{transform:translateY(4px)}
+  @keyframes deal{from{transform:translateY(40px) rotate(-4deg);opacity:0}to{transform:none;opacity:1}}
+  @media (max-width:600px){.card{width:min(88vw,340px);min-height:0;flex-direction:row;flex-wrap:wrap;text-align:left;justify-content:flex-start;padding:14px 16px;gap:4px 10px}
+    .card b{flex:1}.card p{width:100%}.card .rar{width:100%}}
+  #pause{background:rgba(23,8,4,.9);justify-content:flex-start;overflow-y:auto;touch-action:pan-y}
+  .pbox{width:min(94vw,440px);text-align:left;display:flex;flex-direction:column;gap:14px;padding:10px 0 30px}
+  .pbox h2{margin:0;font-size:34px;font-weight:800;color:var(--gold);letter-spacing:-.02em}
+  .pbox h3{margin:10px 0 0;font-size:15px;font-weight:600;letter-spacing:.14em;color:var(--scrap)}
+  .goal{display:flex;flex-direction:column;gap:6px;background:rgba(60,13,3,.6);border-radius:12px;padding:12px 14px}
+  .goal .gl{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+  .goal.done{opacity:.55}
+  .gbar{height:6px;background:var(--soot);border-radius:3px;overflow:hidden}.gbar i{display:block;height:100%;background:var(--gold)}
+  .pbox .note{font-size:14px;opacity:.6;line-height:1.5}
+  .skins{display:flex;gap:10px;flex-wrap:wrap}
+  .skins button{width:52px;height:52px;border-radius:50%;border:3px solid transparent}
+  .skins button.on{border-color:var(--gold)}.skins button.lock{opacity:.25}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hudBtns"><button id="menuBtn" aria-label="Missions and pause">≡</button><button id="mute" aria-label="Toggle sound">♪</button></div>
+<button id="dash" aria-label="Ability">DASH</button>
+<button id="dash2" aria-label="Player 2 ability">DASH</button>
+<div id="shop"><div class="t">HUB · SPEND SAFE SCRAP</div><div class="row"></div></div>
+<div id="pick" class="ov"><div class="pt"></div><div class="ps"></div><div class="cards"></div></div>
+<div id="pause" class="ov"><div class="pbox"></div></div>
+<div id="menu" class="ov">
+  <h1>SALVAGE<span>RUN</span></h1>
+  <p>Grab scrap. Get out alive. Bank it before someone takes it.</p>
+  <div class="chars" id="charPick"></div>
+  <div class="modes">
+    <button id="go" class="big">SOLO</button>
+    <button id="goParty" class="alt">PARTY<small>2 players · one screen · offline</small></button>
+    <button id="goOnline" class="alt">ONLINE<small>host or join with a code · up to 4</small></button>
+  </div>
+  <div id="menuMeta"></div>
+  <small>Drag to move · auto-fire · ability button · WASD + Space on desktop</small>
+  <a id="reset">reset progress</a>
+</div>
+<div id="party" class="sub">
+  <h2>PARTY</h2>
+  <p>One device, split screen. 6 minutes. Most scrap banked wins. You can shoot each other.</p>
+  <div class="pcol"><div><h3 style="color:#f6e7d8">P1 · left / top</h3><div class="chars" id="p1c"></div><small style="opacity:.6">WASD + Space</small></div>
+  <div><h3 style="color:#ff9fd0">P2 · right / bottom</h3><div class="chars" id="p2c"></div><small style="opacity:.6">Arrows + Enter</small></div></div>
+  <button id="partyStart" class="big">FIGHT</button><button class="link" data-back>back</button>
+</div>
+<div id="online" class="sub">
+  <h2>ONLINE</h2>
+  <input class="namein" id="nameIn" maxlength="10" placeholder="your name">
+  <div class="row2"><button id="hostBtn" class="big">HOST</button></div>
+  <p>or join a friend</p>
+  <div class="row2"><input class="codein" id="codeIn" maxlength="5" placeholder="CODE"><button id="joinBtn" class="alt">JOIN</button></div>
+  <p id="netMsg" style="min-height:24px"></p>
+  <button class="link" data-back>back</button>
+</div>
+<div id="lobby" class="sub">
+  <h2>YOUR ROOM</h2>
+  <p>Send this code to your friends</p>
+  <div class="code" id="roomCode">-----</div>
+  <div id="lobbyList"></div>
+  <button id="lobbyStart" class="big">START</button>
+  <p style="font-size:14px">Friends can also join after you start.</p>
+  <button class="link" id="lobbyBack">cancel</button>
+</div>
+<div id="results" class="sub">
+  <h2 id="resTitle">P1 WINS</h2>
+  <div id="resBody" style="font-size:18px;line-height:1.7"></div>
+  <button id="resAgain" class="big">REMATCH</button><button class="link" id="resMenu">menu</button>
+</div>
+<script src="a.js"></script>
+<script src="b.js"></script>
+<script src="c.js"></script>
+<script src="d.js"></script>
+<script src="e.js"></script>
+<script src="f.js"></script>
+<script src="g.js"></script>
+</body>
+</html>

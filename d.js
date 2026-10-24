@@ -29,7 +29,7 @@ function updatePlayer(p,dt){
     if(pvp())for(const q of players){if(q===p||p.dashHit.has(q)||!targetable(q))continue;if((q.x-p.x)**2+(q.y-p.y)**2<(q.r+p.r+6)**2){p.dashHit.add(q);hitPlayer(q,dd,p)}}
     for(const c of crates){if(c.dead>0||p.dashHit.has(c))continue;if((c.x-p.x)**2+(c.y-p.y)**2<(c.r+p.r+6)**2){p.dashHit.add(c);hitCrate(c,dd,p)}}}
   else{const s=p.spd*(cl?1.35:1);p.x+=mx*s*dt;p.y+=my*s*dt}
-  p.x=clamp(p.x,p.r,WORLD-p.r);p.y=clamp(p.y,p.r,WORLD-p.r);
+  if(!VLT){p.x=clamp(p.x,p.r,WORLD-p.r);p.y=clamp(p.y,p.r,WORLD-p.r)}
   p.abCd-=dt;p.inv-=dt;p.hurt-=dt;
   if(mode==='solo'&&save.ftue===0){p.ftueMove+=m*p.spd*dt;if(p.ftueMove>260)ftueNext()}
   const ih=inHub(p);
@@ -113,7 +113,7 @@ function updateEnemies(dt){
       else if(tgt&&e.slamCd<=0&&bd<150*150)e.slamT=.85}
     e.vx=ax*sp;e.vy=ay*sp;e.x+=e.vx*dt;e.y+=e.vy*dt;
     const hd=Math.hypot(e.x-HUB.x,e.y-HUB.y);if(hd<HUB.r+e.r){e.x=HUB.x+(e.x-HUB.x)/hd*(HUB.r+e.r);e.y=HUB.y+(e.y-HUB.y)/hd*(HUB.r+e.r)}
-    e.x=clamp(e.x,e.r,WORLD-e.r);e.y=clamp(e.y,e.r,WORLD-e.r);
+    if(!VLT){e.x=clamp(e.x,e.r,WORLD-e.r);e.y=clamp(e.y,e.r,WORLD-e.r)}
     if(tgt&&e.hitCd<=0&&Math.hypot(tgt.x-e.x,tgt.y-e.y)<e.r+tgt.r){e.hitCd=.7;if(tgt.isP)hitPlayer(tgt,e.dmg,e);else hitRival(tgt,e.dmg,null)}
     if(!boss&&!players.some(p=>p.dead<=0&&Math.hypot(p.x-e.x,p.y-e.y)<1500))e.dead=true}
   for(let i=0;i<enemies.length;i++){const a=enemies[i];if(a.dead)continue;for(let j=i+1;j<enemies.length;j++){const b=enemies[j];if(b.dead)continue;

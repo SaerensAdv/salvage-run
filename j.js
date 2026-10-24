@@ -135,7 +135,7 @@ const _pu7=updatePickups;updatePickups=function(dt){const c0=players.map(p=>p.ca
 
 /* ---------- LOOT ---------- */
 let wloot=[],lid=0;
-const lootOn=()=>mode==='solo'||mode==='host';
+const lootOn=()=>mode==='solo'||mode==='host'||(mode==='party'&&VLT&&VLT.coop);
 function rollRar(w){let r=0;const tot=w.reduce((a,b)=>a+b,0);let x=Math.random()*tot;for(;r<5;r++){x-=w[r];if(x<=0)break}
   if(r<3&&save.pity>=PITY-1)r=3;if(r>=3)save.pity=0;else save.pity++;return r}
 function spawnLoot(x,y,it){const a=rand(0,TAU);wloot.push({id:++lid,x,y,vx:Math.cos(a)*140,vy:Math.sin(a)*140,age:0,it});if(wloot.length>60)wloot.shift()}
@@ -173,7 +173,7 @@ const _fb6=finishBank;finishBank=function(p,h,vb){_fb6(p,h,vb);if(vb)secure(p)};
 
 /* ---------- LOOP ---------- */
 const _up6=update;
-update=function(rdt){const lp=players.filter(p=>!p.remote),norm=mode==='host'&&!raid;
+update=function(rdt){const lp=players.filter(p=>!p.remote),norm=mode==='host'&&!raid&&!(VLT&&VLT.coop);
   if(mode==='solo'||mode==='host')for(const p of lp)if(p.gearSig!==gearSig){p.gear=Object.assign(gearTotals(),{norm});p.gearSig=gearSig;recalc(p)}
   for(const p of players)if(p.gear&&mode==='host'&&p.gear.norm!==norm){p.gear.norm=norm;recalc(p)}
   for(const p of players){p.magT=(p.magT||0)-rdt;p.bwT=(p.bwT||0)-rdt;if(p.abBoostT>0){p.abBoostT-=rdt;p._sb=p.spd;p.spd*=1.4}else p._sb=null}
@@ -190,7 +190,7 @@ hostOnData=function(conn,d){if(d&&d.t==='gear'){const p=players.find(q=>q.id===c
     if(d.st&&typeof d.st==='object')for(const k in AFX)if(d.st[k]!=null)st[k]=clamp(+d.st[k]||0,-30,CAPS[k]);
     if(d.pk&&typeof d.pk==='object')for(const k of GPERKS)if(d.pk[k])pk[k]=clamp(d.pk[k]|0,0,3);
     if(d.u&&typeof d.u==='object')for(const k of UKEYS)if(d.u[k])u[k]=1;
-    p.gear={wb:BASES.weapon[d.wb]?d.wb:'blaster',st,pk,u,gs:clamp(d.gs|0,0,120),norm:!raid};const b=p.maxHp;recalc(p);if(inHub(p))p.hp+=Math.max(0,p.maxHp-b);return}
+    p.gear={wb:BASES.weapon[d.wb]?d.wb:'blaster',st,pk,u,gs:clamp(d.gs|0,0,120),norm:!raid&&!(VLT&&VLT.coop)};const b=p.maxHp;recalc(p);if(inHub(p))p.hp+=Math.max(0,p.maxHp-b);return}
   _ho6(conn,d)};
 const _bs6=buildSnap;
 buildSnap=function(c){const s=_bs6(c);if(!s)return s;const P=players.find(q=>q.id===c.pid);

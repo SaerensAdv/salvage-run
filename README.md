@@ -1,4 +1,4 @@
-# Salvage Run v0.7
+# Salvage Run v0.8
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -28,6 +28,16 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Hot loot:** found gear is hot until you bank it in the hub or at a beacon. Die and it drops where you fell. Equipped gear is always safe. Max 3 hot items at once.
 - **Fair odds:** every drop table is visible in the GEAR screen. An Epic or better is guaranteed within 25 drops. Your first 8 drops come 3x as often from crates so new players get a build going.
 - **Where gear counts:** Solo and Co-op raids use full gear. Online free-for-all keeps your weapon type but evens out the stats. Party on one device plays without gear. Monsters scale a little with your gear score.
+
+## Vaults (v0.8)
+
+- **Rifts:** every few minutes a vault rift opens in Zone 2 or 3. Stand in it to dive, with everything you carry.
+- **Floors:** 4 to 6 rooms per floor, built from a seed: arenas (doors lock until every wave is down), trap rooms, treasure rooms and an exit room. Every 3rd floor has a boss.
+- **Push your luck:** in the exit room, stand on EXTRACT to bank it all (×1.1 per floor) or on DEEPER for the next floor. Its modifier is shown up front: Overheat, Fog, Swarm, Glass or Greed. Die in a vault and everything you carried stays down there.
+- **4 biomes:** Scrapyard (Magnet Crabs steal scrap, boss Crusher), Foundry (Slag Golems leave fire, boss Forge Warden), Sewer (rat swarms, boss The Rat King), Reactor (Arc Wisps explode, boss Core Prime).
+- **Loot:** chests always drop gear and get one rarity step better every 2 floors. **Sets** only drop in vaults: Scrapper's Rig, Warden's Oath, Ghost Veil and Collector's Regalia (Salvaged only), each with a 2-piece and a 4-piece bonus.
+- **Daily Vault:** same layout, biome and modifiers for everyone each day. Start it from the menu. Your best floor is saved.
+- Vaults are solo for now. Co-op vaults come later.
 
 ## Weekly contract
 

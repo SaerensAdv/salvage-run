@@ -1,4 +1,4 @@
-# Salvage Run v0.6
+# Salvage Run v0.7
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -18,12 +18,15 @@ Grab scrap. Get out alive. Bank it before someone takes it.
   - Controllers: plug in or pair up to 4 gamepads. Stick or d-pad moves, A = ability, X / Y / B pick perk cards 1 / 2 / 3. In Solo, Start pauses and A on the main menu starts a run.
 - **Online:** the host's device runs the world. Guests send input and receive snapshots 15 times per second. Peers find each other through the free PeerJS signaling server; game data then flows peer-to-peer (WebRTC). Controllers work for guests too.
 
-## Gear (v0.6)
+## Gear (v0.7)
 
-- **4 slots:** weapon, armor, boots, backpack. **3 rarities:** Common (grey), Uncommon (green), Rare (blue). Every item has an item level, a base type and 1-3 bonus stats.
+- **10 slots:** weapon, helmet, armor, legs, boots, gloves, backpack, 2 rings, necklace. Every item has an item level, a base type and bonus stats from 18 affixes.
+- **6 rarities:** Common, Uncommon, Rare, Epic (adds a run perk), Legendary (a unique effect, like Twin Coil, Bulwark or Mule Frame) and Salvaged (named, near-mythic, can't be scrapped).
 - **Weapons change how you fire:** Blaster (steady), Scattergun (3 pellets, short range), Rail (slow, heavy, pierces), Burst SMG (fast, sprays).
+- **Forge:** level any item +1 to +10 with scrap and cores (+6% stats per level). +5 adds an extra affix, +10 unlocks one affix reroll. Forging never fails and never breaks an item.
+- **Cores:** dismantle spare gear for cores (1 / 3 / 8 / 20 / 50). A full stash (60) auto-dismantles new drops, except Salvaged.
 - **Hot loot:** found gear is hot until you bank it in the hub or at a beacon. Die and it drops where you fell. Equipped gear is always safe. Max 3 hot items at once.
-- **GEAR screen** (◈ in a run, or GEAR in the menu): compare, equip (only in the hub or the menu) and scrap items. Drop odds are visible, and a Rare is guaranteed within 15 drops.
+- **Fair odds:** every drop table is visible in the GEAR screen. An Epic or better is guaranteed within 25 drops. Your first 8 drops come 3x as often from crates so new players get a build going.
 - **Where gear counts:** Solo and Co-op raids use full gear. Online free-for-all keeps your weapon type but evens out the stats. Party on one device plays without gear. Monsters scale a little with your gear score.
 
 ## Weekly contract

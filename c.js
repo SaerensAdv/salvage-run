@@ -2,7 +2,7 @@
 const greedMul=p=>1+.25*((p&&p.run.perks.greed)||0);
 const cloaked=p=>p.char==='ghost'&&p.abT>0;
 const targetable=p=>p.dead<=0&&!inHub(p)&&!cloaked(p)&&!p.picking;
-const pvp=()=>mode!=='solo'&&!raid;
+const pvp=()=>mode!=='solo'&&!raid&&!(typeof VLT!=='undefined'&&VLT&&VLT.coop);
 function dropScrap(x,y,total,spread=1){total=Math.floor(total);if(total<=0)return;const n=Math.min(14,Math.max(1,Math.ceil(total/3)));let left=total;
   for(let i=0;i<n;i++){const v=i===n-1?left:Math.max(1,Math.floor(total/n));left-=v;if(v<=0)continue;const a=rand(0,TAU),s=rand(60,220)*spread;
     pickups.push({id:++pid2,k:'s',x,y,v,vx:Math.cos(a)*s,vy:Math.sin(a)*s,age:0})}}

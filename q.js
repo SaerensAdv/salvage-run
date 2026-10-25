@@ -308,4 +308,20 @@ if(!RANKS.v13){RANKS.v13=1;for(let i=1;i<RANKS.length;i++)for(const gl of RANKS[
 /* Saves from the first v0.13 slice earned mastery per hit: keep progress up to rank 3. */
 if(save.v13Migration===1){save.mastery=v13CleanMastery(save.mastery);for(const f of V13_FAMILIES)save.mastery[f]=Math.min(save.mastery[f],V13_LEVEL_XP[3]);save.v13Migration=2;persist()}
 if(window.__game)Object.assign(window.__game,{buy,gainXp,hitEnemy,v13pacing:{V13_AGGRO,V13_GATE_RANK,V13_UPCAP,table:V13_LEVEL_XP,runNext:v13RunNext,upCap:v13UpCap}});
+/* Workshop shows the ring cap: locked pips, a CAPPED button and which Gatekeeper lifts it. */
+const v13CapNext=()=>{const r=curReg();if(r>=3)return null;return {gk:REG[r+1].gk[0],rank:V13_GATE_RANK[r]+1,cap:V13_UPCAP[r+1]}};
+const v13UpStyle=document.createElement('style');
+v13UpStyle.textContent=`.pips i.x{background:repeating-linear-gradient(45deg,#3c0d03 0 3px,#170804 3px 6px);opacity:.7}.buy.cap{background:rgba(23,8,4,.8);color:#ed9b49!important;border:2px dashed #8c5c32;box-shadow:none}.ucap{font-size:14px;color:#ed9b49;line-height:1.4}`;
+document.head.appendChild(v13UpStyle);
+tabUpg=function(){const ok=canSwap(),cap=v13UpCap(),nx=v13CapNext();
+  const head=`WORKSHOP · ${ok?'spend safe scrap':'go to the hub to buy'} · CAP LV ${cap}`;
+  const how=nx?`<div class="ucap">Beat ${nx.gk} (rank ${nx.rank}) to raise the cap to LV ${nx.cap}.${save.rank+1<nx.rank?` You are rank ${save.rank+1}.`:''}</div>`:'<div class="ucap">Every gate is open. No cap left.</div>';
+  return `<div class="pan" style="grid-column:1/-1"><h4>${head}</h4>${how}<div class="ugrid">`+Object.keys(UPG).map(k=>{const lv=save.lv[k],mx=lv>=UPMAX,capped=!mx&&lv>=cap,c=cost(k),can=ok&&!mx&&!capped&&save.bank>=c;
+    const pips=Array.from({length:UPMAX},(_,i)=>`<i class="${i<lv?'f':i>=cap?'x':''}"></i>`).join('');
+    const btn=mx?`<button class="buy no" data-act="buy" data-k="${k}">MAX</button>`:capped?`<button class="buy cap" data-act="buy" data-k="${k}" aria-disabled="true">CAPPED · LV ${cap}</button>`:`<button class="buy${can?'':' no'}" data-act="buy" data-k="${k}">BUY · ◆ ${c}</button>`;
+    return `<div class="ut"><b>${UIC[k]} ${UPG[k].n}</b><span class="d">${UDESC[k]} per level · LV ${lv}/${Math.max(cap,Math.min(lv,UPMAX))}${cap<UPMAX?` · max ${UPMAX}`:''}</span><div class="pips">${pips}</div>${btn}</div>`}).join('')+`</div></div>`};
+const _v13pUiTick=uiTick;
+uiTick=function(){_v13pUiTick();if(typeof hubBar==='undefined'||!hubBar.querySelector)return;const cap=v13UpCap(),b=hubBar.querySelector('button[data-t="upg"]');
+  if(b&&b.classList){const any=Object.keys(UPG).some(k=>save.lv[k]<Math.min(cap,UPMAX)&&save.bank>=cost(k));tg(b,'hot',any)}};
+if(window.__game)Object.assign(window.__game,{uiTick});
 document.title='Salvage Run · v0.13';

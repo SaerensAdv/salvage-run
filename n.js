@@ -89,7 +89,7 @@ const _mm10=menuMeta;menuMeta=function(){_mm10();ensureGear();const pf=$('prof')
 /* ---------- BASE ---------- */
 const baseEl=mk('div','base');document.body.appendChild(baseEl);
 let bTab='upg',bSel=null,bFilt=null,bPage=0,bCap=12,bWasPlay=false,bCrew=null;
-const UDESC={dmg:'+20% damage',spd:'+12 speed',hp:'+25 hull',mag:'+18% magnet',bag:'+25 bag space'},UIC={dmg:'✸',spd:'➤',hp:'✚',mag:'U',bag:'▣'};
+const UDESC={dmg:'+20% damage',spd:'+12 speed',hp:'+25 hull',mag:'+50% magnet',bag:'+25 bag space'},UIC={dmg:'✸',spd:'➤',hp:'✚',mag:'U',bag:'▣'};
 const baseOpen=()=>baseEl.style.display==='flex';
 function openBase(tab){ensureGear();ensureCrew();if(tab)bTab=tab;if(state==='play'&&pausing()){state='pause';bWasPlay=true}releaseAll();baseEl.style.display='flex';bPage=0;renderBase()}
 function closeBase(){baseEl.style.display='none';if(bWasPlay&&state==='pause')state='play';bWasPlay=false;if(state==='menu')menuMeta()}
@@ -160,11 +160,11 @@ function drawMapCanvas(){const c=$('mapc');if(!c||!c.getContext||!c.clientWidth)
   for(const q of SHRINES){if(q.r>R)continue;const [qx,qy]=P(q.x,q.y);x.fillStyle=BUFFS[q.k][2];x.fillRect(qx-3,qy-3,6,6)}
   const me=meP();if(me&&state!=='menu'&&!VLT){const [px,py]=P(me.x,me.y);x.fillStyle='#fff';x.beginPath();x.arc(px,py,4,0,TAU);x.fill()}
   x.font='700 14px Sora, system-ui, sans-serif';x.textAlign='center';x.fillStyle='rgba(246,231,216,.8)';x.fillText('▲ camp  ■ gate  ◆ shrine',cx,h-8)}
-function renderBase(){if(!baseOpen())return;const tabs=[['upg','UPGRADES'],['gear','GEAR'],['crew','CREW'],['map','MAP']].filter(t=>mode!=='party'||t[0]==='upg'||t[0]==='map');
+function renderBase(){if(!baseOpen())return;const tabs=[['upg','UPGRADES'],['gear','GEAR'],['crew','CREW'],['map','MAP'],['wastes','WASTES']].filter(t=>mode!=='party'||t[0]==='upg'||t[0]==='map');
   if(!tabs.some(t=>t[0]===bTab))bTab='upg';
   baseEl.innerHTML=`<div class="bh"><h2>BASE</h2><div class="chips"><span class="chip" style="color:#f5c34d">◆ ${nfmt(save.bank)}</span><span class="chip">⬢ ${save.cores||0}</span><span class="chip">GS ${gearScore()}</span></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="tabs">${tabs.map(t=>`<button data-act="tab" data-t="${t[0]}" class="${t[0]===bTab?'on':''}">${t[1]}</button>`).join('')}</div>
-  <div id="bbody" class="t-${bTab}">${bTab==='gear'?tabGear():bTab==='crew'?tabCrew():bTab==='map'?tabMap():tabUpg()}</div>`;
+  <div id="bbody" class="t-${bTab}">${bTab==='gear'?tabGear():bTab==='crew'?tabCrew():bTab==='map'?tabMap():bTab==='wastes'&&typeof tabWastes==='function'?tabWastes():tabUpg()}</div>`;
   if(bTab==='gear'){const g=$('bstash');if(g&&g.clientWidth){const cols=Math.max(1,Math.floor((g.clientWidth+6)/76)),rows=Math.max(1,Math.floor((g.clientHeight+6)/(g.querySelector&&g.querySelector('.tl')&&g.querySelector('.tl').offsetHeight?g.querySelector('.tl').offsetHeight+6:72))),cap=Math.max(cols,cols*rows);
       if(cap!==bCap){bCap=cap;renderBase();return}}}
   if(bTab==='map')drawMapCanvas()}

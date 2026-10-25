@@ -4,7 +4,8 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 
 ## Play
 
-- **Fastest:** open `index.html` in a browser (keep all files together). Solo and Party work right away, with or without internet.
+- **Latest test build:** https://saerensadv.github.io/salvage-run/ (GitHub Pages from the `play` branch, always the newest build).
+- **Fastest offline:** open `index.html` in a browser (keep all files together). Solo and Party work right away, with or without internet.
 - **Install on your phone (offline):** put this folder on any static host (GitHub Pages, Netlify Drop, Cloudflare Pages). Open the URL on your phone and choose "Add to Home Screen". After the first visit Solo and Party run fully offline.
 - **Online:** needs internet on every device. The host taps ONLINE → HOST, then SHARE INVITE (or reads out the 5-letter code). Friends open the invite link (`?join=CODE` prefills the code) or type the code and tap JOIN. Max 4 humans plus raiders.
 
@@ -88,6 +89,13 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - Saves from the first v0.13 slice keep their mastery up to rank 3.
 - All values are starting points (DEC-094) until the human playtest confirms them.
 
+## Logo, icons & readable UI (v0.13 · in progress)
+
+- **Logo** in the menu and a new app icon. iOS ignores SVG home-screen icons, so the game draws a PNG from `icon.svg` at start.
+- **One icon set** (`r.js`, `s.js`): scrap, cores, skull, gear slots, weapon types, crew, gadgets, perks, characters, mastery families, elements, tabs and hub buttons. The same paths draw in the HTML screens and on the canvas, so icons look the same on every phone.
+- **Gear:** stash tiles show the item icon, a rarity letter (C U R E L S), IP and E/▲ badges. Hot items get a flame and a HOT note in the details. The HUD shows a small HOT chip next to the vital panel.
+- **Base:** tabs with icons on one row, panels scroll so every button stays reachable in landscape. The hub bar fits on a phone and moves up in split screen. In-game buttons hide behind Pause, Pick and Base.
+
 ## Companions & gadgets (v0.9)
 
 - **One companion** (Base → Crew). Unlocks at rank 2, the Turret drone is free; others cost 120 safe scrap. Feed them scrap (and cores from Lv 4) up to Lv 10.
@@ -107,17 +115,19 @@ Some carriers block direct peer-to-peer. Fix: create a free Metered account (20 
 
 ## Hosting on GitHub Pages
 
-Settings → Pages → Deploy from branch → `main` / root. On a free plan the repo must be public for Pages.
+Settings → Pages → Deploy from branch → `play` / root. `play` always holds the latest test build; `main` only changes after approval. On a free plan the repo must be public for Pages.
 
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), and `q.js` (Combat Mastery). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), `q.js` (Combat Mastery), `r.js` (logo and icon set) and `s.js` (UI pass 2). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
 - v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
 - v0.12 validation: 20 Wastes checks (levels, outpost safety and banking, skull, double rewards, boss pity, evolution, contract and skull death), online sync checks for region, skull, bosses, contracts, collection log and skull loss, 47 v0.11 regression checks, co-op vault unit/network regressions and the corrected v0.8 vault regression; Wastes HUD and BASE tab checked at 390×844 portrait and 844×390 landscape. Bots/tests only; real-player balance and mobile-network testing remain open.
 - v0.13 validation (bots only): Solo before/after (15 runs, about 24 h simulated), Party Versus and Co-op Raid with 2 and 4 players, Online free-for-all and Co-op Raid with a host + 2 guests; 14 pacing checks, 11 workshop-UI checks and the v0.12 Wastes, network and co-op vault regressions. Report: Game Design doc → v0.13 Balance Report. Human balance, real devices and the 2-player raid target are still open.
+- v0.13 screen-density pass: compacted the HUD, reduced duplicate split-screen notices, fitted banners, capped/merged damage numbers, and shortened repeated world labels. Ten staged scenes rendered from the real draw calls; measured canvas UI coverage fell from 54% to 18% in 4P phone landscape, from 32% to 19% in 2P split and from 28% to 12% in early solo portrait. Zero clipped HUD text in all ten frames. These are offline-render estimates, not real-device results; phone and 2-4 player couch checks remain open.
+- v0.13 UI pass: 23 screens (menu, all Base tabs, gear detail, odds, crew detail, level-up, pause, hub, gadgets, death, vault, Party split, results, online, lobby) in portrait 390×844 and landscape 844×390 in headless Chromium: 0 offscreen texts, 0 tap targets under 40 px, 0 old glyphs, 0 page errors. Real iOS/Android checks remain open.
 - v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits

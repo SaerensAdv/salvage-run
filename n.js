@@ -89,7 +89,7 @@ const _mm10=menuMeta;menuMeta=function(){_mm10();ensureGear();const pf=$('prof')
 /* ---------- BASE ---------- */
 const baseEl=mk('div','base');document.body.appendChild(baseEl);
 let bTab='upg',bSel=null,bFilt=null,bPage=0,bCap=12,bWasPlay=false,bCrew=null;
-const UDESC={dmg:'+20% damage',spd:'+12 speed',hp:'+25 hull',mag:'+50% magnet',bag:'+25 bag space'},UIC={dmg:'✸',spd:'➤',hp:'✚',mag:'U',bag:'▣'};
+const UDESC={dmg:'+20% damage',spd:'+12 speed',hp:'+25 hull',mag:'+18% magnet',bag:'+25 bag space'},UIC={dmg:'✸',spd:'➤',hp:'✚',mag:'U',bag:'▣'};
 const baseOpen=()=>baseEl.style.display==='flex';
 function openBase(tab){ensureGear();ensureCrew();if(tab)bTab=tab;if(state==='play'&&pausing()){state='pause';bWasPlay=true}releaseAll();baseEl.style.display='flex';bPage=0;renderBase()}
 function closeBase(){baseEl.style.display='none';if(bWasPlay&&state==='pause')state='play';bWasPlay=false;if(state==='menu')menuMeta()}

@@ -79,4 +79,50 @@ const _dhS2=drawHud;drawHud=function(p,W2,H2,Zv,v){const g=mode==='guest',hot=g?
 /* ---------- split screen: lift the hub bar above the shared buttons ---------- */
 const _utS2=uiTick;uiTick=function(){_utS2();if(typeof hubBar==='undefined'||!hubBar.style)return;hubBar.style.bottom=(state==='play'||state==='pick')&&views().length>1?'58px':''};
 
+/* ---------- mobile polish: no clipped pause actions, no horizontal overlay overflow, readable Base tabs ---------- */
+const srMobileCss=document.createElement('style');
+srMobileCss.textContent=`
+#menu,#party,#online,#lobby,#results,#pause,#base{max-width:100vw;overflow-x:hidden;box-sizing:border-box}
+#menu .mwrap{width:min(100%,440px)!important;max-width:100%}
+@media (orientation:landscape) and (max-height:620px){#menu .mwrap{width:min(100%,900px)!important;max-width:100%}}
+#party.sub,#online.sub,#lobby.sub{width:100vw;max-width:100vw;box-sizing:border-box}
+#party.sub>*,#online.sub>*,#lobby.sub>*{max-width:100%;min-width:0}
+#party .pn,#party .pm,#party .pcol,#lobby .lm{width:min(100%,420px);max-width:100%;box-sizing:border-box}
+#party .pcol{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+#party .pcol>div{min-width:0}
+#pause .pbox{width:min(94vw,440px);max-width:calc(100vw - 24px);min-width:0;box-sizing:border-box;overflow-x:hidden}
+#pause .ptop{display:flex;flex-wrap:nowrap;gap:6px;width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+#pause .ptop>*{flex:1 1 0;min-width:0;width:auto;max-width:100%;padding:8px 2px!important;font-size:clamp(12px,3.25vw,14px)!important;letter-spacing:.04em!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#base .tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px;min-width:0}
+#base .tabs button{min-width:0;white-space:nowrap;padding-left:1px!important;padding-right:1px!important}
+@media (max-width:600px){#base .tabs button{font-size:12px!important;letter-spacing:0!important}#base .tabs button .sri{width:18px;height:18px}}
+@media (orientation:landscape) and (max-height:620px){.v13rows{grid-template-columns:1fr!important;gap:3px!important}.v13row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(70px,1fr)!important;align-items:center}.v13row>:first-child{font-size:12px;white-space:normal;overflow:visible;text-overflow:clip}}
+.sr-phone-note{display:block;max-width:min(94vw,420px);font-size:13px;line-height:1.35;color:#f6e7d8;opacity:.8;text-align:center}
+#party .pn button:disabled{opacity:.42!important;cursor:not-allowed!important;filter:saturate(.45)}
+@media (max-width:600px){#party .pm button{font-size:clamp(11px,3.2vw,13px)!important;letter-spacing:0!important;padding-left:1px!important;padding-right:1px!important}#party .pn button{font-size:clamp(11px,3.2vw,13px)!important;letter-spacing:0!important;padding-left:1px!important;padding-right:1px!important}}
+`;
+if(document.head&&document.head.appendChild)document.head.appendChild(srMobileCss);
+
+/* Compact phone labels keep the five Base tabs comfortably tappable without hiding their full names from assistive tech. */
+const srTabFull={upg:'UPGRADES',gear:'GEAR',crew:'CREW',map:'MAP',wastes:'WASTES'},srTabShort={upg:'UPG',gear:'GEAR',crew:'CREW',map:'MAP',wastes:'WASTE'};
+const srBaseTabLabels=()=>{const small=(window.innerWidth||W)<=600;for(const b of document.querySelectorAll('#base .tabs button')){const k=b.dataset.t,full=srTabFull[k];if(!full)continue;b.setAttribute('aria-label',full);const tn=[...b.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()===full);if(tn)tn.textContent=small?srTabShort[k]:full}};
+const _srRenderBaseMobile=renderBase;renderBase=function(){_srRenderBaseMobile();if(typeof baseOpen==='function'&&baseOpen())srBaseTabLabels()};
+window.addEventListener('resize',()=>{if(typeof baseOpen==='function'&&baseOpen())srBaseTabLabels()});
+
+/* Four-player phone splits are too cramped to promise as a phone mode. Keep 2P as the mobile target. */
+const srPhoneViewport=()=>Math.min(window.innerWidth||W,window.innerHeight||H)<600;
+const _srPartyMobile=renderParty;
+renderParty=function(){if(srPhoneViewport()&&partyN>=4)partyN=2;_srPartyMobile();
+  const box=document.getElementById('party');if(!box)return;
+  let note=box.querySelector('.sr-phone-note');
+  if(!srPhoneViewport()){if(note)note.remove();return}
+  const pn=box.querySelector('.pn');if(!pn)return;
+  const four=[...pn.querySelectorAll('button')].find(b=>/4\s*PLAYERS/i.test(b.textContent||''));
+  if(four){four.disabled=true;four.setAttribute('aria-disabled','true');four.setAttribute('aria-label','4 players, requires a tablet or TV');four.title='4-player split screen needs a tablet or TV';four.textContent='4P · TV'}
+  if(!note){note=document.createElement('small');note.className='sr-phone-note';pn.insertAdjacentElement('afterend',note)}
+  note.textContent='2 players is the phone target. 4-player split screen needs a tablet or TV.'};
+const _srStartPartyMobile=startParty;
+startParty=function(){if(srPhoneViewport()&&partyN>=4){partyN=2;showOnly('party');renderParty();return}return _srStartPartyMobile()};
+window.addEventListener('resize',()=>{const p=document.getElementById('party');if(p&&p.style.display==='flex')renderParty()});
+
 if(window.__game)Object.defineProperties(window.__game,Object.getOwnPropertyDescriptors({srSvg,itemIc,isHot,srDeco,tabGear,openPickUI}));

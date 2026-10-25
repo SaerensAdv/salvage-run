@@ -73,9 +73,20 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Weapon families:** Blaster/Burst migrate to Bow, Scattergun to Sword, and Rail to Staff. The migration preserves each item's ID, rarity, affixes, forge level, unique effect and equipped slot.
 - **Sword:** a risky close-range sweep. **Bow:** precise, fast-travelling auto-aim shots. **Staff:** a slower area attack.
 - **Elements:** Fire burns, Water slows, Earth staggers and briefly breaks armor, Wind knocks back. One active effect per enemy prevents status stacking.
-- **Mastery:** three permanent 10-rank tracks earn XP from weapon hits and persist in the existing browser save. Only the active family adds damage, capped at +12%; milestone ranks add family behavior upgrades.
+- **Mastery:** three permanent 10-rank tracks earn XP from kills and persist in the existing browser save. Only the active family adds damage, capped at +12%; milestone ranks add family behavior upgrades.
 - **Online:** the host remains authoritative for combat. Guest mastery progress is sent back to that guest's own save.
 - **Current implementation slice:** family attacks, elemental status handling, legacy-weapon migration, mastery persistence/sync, and a loadout/mastery selector. Full balance tuning, complete regression QA, and the 20+ minute human playtest are still required before release.
+
+## Pacing & mode rules (v0.13 · in progress)
+
+- **Solo: grind first, then the adventure begins.** The Scrap Plains are the opening grind. Gatekeepers only wake at a rank: Rustjaw at rank 5, The Foreman at rank 7, Core Tyrant at rank 9. Beating Rustjaw opens the Wastes ("THE WASTES ARE OPEN").
+- **Workshop cap per open ring:** LV 5 in the Plains, then 7, 9 and 10. BASE → Upgrades shows the cap, the locked pips and which Gatekeeper lifts it.
+- **Run levels depend on the mode.** Solo, vaults and co-op vaults use the grind curve (XP to the next level: 9 × 1.32^(level−1)). Party, Online free-for-all and co-op raids are short matches: they keep the arcade curve (5 × 1.3^(level−1)) and the original monster density.
+- **Rank goals** that count things take 2× as long for ranks 2-5 and 1.5× after that. Level, haul and upgrade goals are unchanged.
+- **Mastery comes from kills,** weighted by the monster's XP (elites ×3, bosses and Gatekeepers ×5), on a 10-rank curve from 500 to 160,000 XP. In Party only P1 earns mastery, because it is P1's save. Online guests earn mastery in their own save; the host tracks it and syncs it back.
+- **Aggro:** monsters notice you at 300 px. Once they chase you or you hit them, they follow up to 560 px. Same in every mode; vaults keep their own rules.
+- Saves from the first v0.13 slice keep their mastery up to rank 3.
+- All values are starting points (DEC-094) until the human playtest confirms them.
 
 ## Companions & gadgets (v0.9)
 
@@ -106,6 +117,7 @@ Settings → Pages → Deploy from branch → `main` / root. On a free plan the 
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
 - v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
 - v0.12 validation: 20 Wastes checks (levels, outpost safety and banking, skull, double rewards, boss pity, evolution, contract and skull death), online sync checks for region, skull, bosses, contracts, collection log and skull loss, 47 v0.11 regression checks, co-op vault unit/network regressions and the corrected v0.8 vault regression; Wastes HUD and BASE tab checked at 390×844 portrait and 844×390 landscape. Bots/tests only; real-player balance and mobile-network testing remain open.
+- v0.13 validation (bots only): Solo before/after (15 runs, about 24 h simulated), Party Versus and Co-op Raid with 2 and 4 players, Online free-for-all and Co-op Raid with a host + 2 guests; 14 pacing checks, 11 workshop-UI checks and the v0.12 Wastes, network and co-op vault regressions. Report: Game Design doc → v0.13 Balance Report. Human balance, real devices and the 2-player raid target are still open.
 - v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits

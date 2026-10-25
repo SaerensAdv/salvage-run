@@ -1,4 +1,4 @@
-# Salvage Run v0.11
+# Salvage Run v0.13 · Combat Mastery (in progress)
 
 Grab scrap. Get out alive. Bank it before someone takes it.
 
@@ -34,7 +34,7 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Rifts:** every few minutes a vault rift opens in Zone 2 or 3. Stand in it to dive, with everything you carry.
 - **Floors:** 4 to 6 rooms per floor, built from a seed: arenas (doors lock until every wave is down), trap rooms, treasure rooms and an exit room. Every 3rd floor has a boss.
 - **Push your luck:** in the exit room, stand on EXTRACT to bank it all (×1.1 per floor) or on DEEPER for the next floor. Its modifier is shown up front: Overheat, Fog, Swarm, Glass or Greed. Die in a vault and everything you carried stays down there.
-- **4 biomes:** Scrapyard (Magnet Crabs steal scrap, boss Crusher), Foundry (Slag Golems leave fire, boss Forge Warden), Sewer (rat swarms, boss The Rat King), Reactor (Arc Wisps explode, boss Core Prime).
+- **4 biomes:** Scrapyard (Magnet Crabs steal scrap, boss Crusher), Foundry (Slag Golems leave fire, boss Forge Warden), Sewer (rat swarms, boss The Rat King), Reactor (Arc Wisps explode when they die).
 - **Loot:** chests always drop gear and get one rarity step better every 2 floors. **Sets** only drop in vaults: Scrapper's Rig, Warden's Oath, Ghost Veil and Collector's Regalia (Salvaged only), each with a 2-piece and a 4-piece bonus.
 - **Daily Vault:** same layout, biome and modifiers for everyone each day. Start it from the menu. Your best floor is saved.
 - Co-op vaults (Party and Online) arrived in v0.11, see below.
@@ -56,6 +56,26 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - EXTRACT and DEEPER resolve only when the whole team stands on the same pad. Everyone banks their own carry. No friendly fire.
 - New modifiers: **SIEGE** (+1 wave per combat room, +25% scrap) and **MIMIC** (a treasure chest wakes 2 elite guards that drop bonus gear).
 - Party and lobby screens use compact mode selectors that fit portrait and landscape without scrolling.
+
+## The Wastes (v0.12)
+
+- **The Ditch:** cross beyond Scrap Plains into Wastes levels 1-50. Level, risk and boss locations are visible on the HUD and map.
+- **Safe outposts:** Rust Rest, Slag Hollow, Ash Camp and Last Light. Inside the green boundary, players cannot damage one another or attack monsters, raiders or crates; scrap banks and hull repairs work.
+- **Skull:** attack another player first, or take a 5-minute skull at the hub/outpost. Scrap collected in the Wastes while skulled pays double when banked. Die skulled and one equipped item drops (never your last weapon). Odds and skull timer are visible.
+- **PKer bots:** Skulk and Grim in Solo/Party; Skulk, Grim and Vandal online. They hunt skulled, glowing and loaded players. PKer tags have visible odds and bad-luck protection.
+- **Wilderness bosses:** Carrion King (Wastes 12), Chaos Rig (28) and The Warlord (45). Each has two unique items (1/20, guaranteed by kill 40) and a pet (1/500). The boss panel shows location, level and health.
+- **Collection log:** 12 slots for boss uniques, pets and PKer tags. Milestones at 3/6/9/12 slots pay safe scrap and grant titles.
+- **Run build + goals:** five weapon evolutions unlock from a maxed perk plus a partner perk. Wastes contracts pay safe scrap and cores. Odds are not hidden; no paid power.
+- **BASE → WASTES:** contract, skull, evolution recipes and the collection log. The hub bar opens the same tab.
+
+## Combat Mastery (v0.13 · in progress)
+
+- **Weapon families:** Blaster/Burst migrate to Bow, Scattergun to Sword, and Rail to Staff. The migration preserves each item's ID, rarity, affixes, forge level, unique effect and equipped slot.
+- **Sword:** a risky close-range sweep. **Bow:** precise, fast-travelling auto-aim shots. **Staff:** a slower area attack.
+- **Elements:** Fire burns, Water slows, Earth staggers and briefly breaks armor, Wind knocks back. One active effect per enemy prevents status stacking.
+- **Mastery:** three permanent 10-rank tracks earn XP from weapon hits and persist in the existing browser save. Only the active family adds damage, capped at +12%; milestone ranks add family behavior upgrades.
+- **Online:** the host remains authoritative for combat. Guest mastery progress is sent back to that guest's own save.
+- **Current implementation slice:** family attacks, elemental status handling, legacy-weapon migration, mastery persistence/sync, and a loadout/mastery selector. Full balance tuning, complete regression QA, and the 20+ minute human playtest are still required before release.
 
 ## Companions & gadgets (v0.9)
 
@@ -81,10 +101,11 @@ Settings → Pages → Deploy from branch → `main` / root. On a free plan the 
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier: regions, gatekeepers, camps, shrines, events) and `n.js` (UI shell: menu, Base screen, hub bar, cards, pause) and `o.js` (co-op vaults, Siege and Mimic modifiers, party and lobby mode selectors). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), and `q.js` (Combat Mastery). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
 - v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
+- v0.12 validation: 20 Wastes checks (levels, outpost safety and banking, skull, double rewards, boss pity, evolution, contract and skull death), online sync checks for region, skull, bosses, contracts, collection log and skull loss, 47 v0.11 regression checks, co-op vault unit/network regressions and the corrected v0.8 vault regression; Wastes HUD and BASE tab checked at 390×844 portrait and 844×390 landscape. Bots/tests only; real-player balance and mobile-network testing remain open.
 - v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
 
 ## Known limits

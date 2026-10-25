@@ -102,9 +102,9 @@ recalc=function(p){
   _v13Recalc(p);if(!p)return;
   const f=v13Family(p.wb),lv=v13Rank(p,f);p.wb=f;p.v13Family=f;
   p.dmg*=1+Math.min(12,lv*1.2)/100;
-  if(f==='sword'){p.dmg*=1.14;p.rate*=.86;p.range=Math.max(135,Math.min(190,p.range*.62))}
-  else if(f==='bow'){p.rate*=.94;p.range=Math.min(520,p.range*1.28)}
-  else{p.dmg*=.9;p.rate*=.64;p.range=Math.min(420,p.range*1.1)}
+  if(f==='sword'){p.dmg*=1.26;p.rate*=.86;p.range=Math.max(135,Math.min(190,p.range*.62))}
+  else if(f==='bow'){p.rate*=.88;p.range=Math.min(460,p.range*1.15)}
+  else{p.dmg*=1.0;p.rate*=.72;p.range=Math.min(420,p.range*1.1)}
 };
 function v13WeaponCoil(p){
   p.vc=(p.vc||0)+1;
@@ -137,7 +137,7 @@ function v13SwordSweep(p,t){
   v13WeaponCoil(p)
 }
 function v13StaffBurst(p,t){
-  const lv=v13Rank(p,'staff'),radius=lv>=3?112:88,el=v13ElementFor(p),hit=v13AttackDamage(p,.78);
+  const lv=v13Rank(p,'staff'),radius=lv>=3?120:98,el=v13ElementFor(p),hit=v13AttackDamage(p,.78);
   fxRing(t.x,t.y,radius,V13_EL_COL[el],.3);fxBurst(t.x,t.y,V13_EL_COL[el],10,180);snd(p,260,.1,'sine',.04,1.2);
   for(const e of enemies)if(!e.dead&&Math.hypot(e.x-t.x,e.y-t.y)<radius+e.r)hitEnemy(e,hit.dmg,p,'v13_staff',hit.crit);
   for(const r of rivals)if(r.dead<=0&&Math.hypot(r.x-t.x,r.y-t.y)<radius+r.r)hitRival(r,hit.dmg,p);
@@ -254,4 +254,58 @@ const v13Base=$('base');if(v13Base)v13Base.addEventListener('click',v13HandleEle
 const v13Profile=$('prof');if(v13Profile)v13Profile.addEventListener('click',v13HandleElement);
 if(window.__game)Object.assign(window.__game,{v13:{families:V13_FAMILIES,elements:V13_ELEMENTS,migrate:v13Migrate,mastery:v13Mastery,level:v13Level,element:v13ElementOfItem,cycleElement:v13CycleElement}});
 v13RenderPanel();
+
+/* ================= v0.13 · PACING (grind first, then the adventure begins) =================
+   Phase 1 lives in the Scrap Plains: slower run levels, a workshop cap, rank-gated Gatekeepers.
+   Beating Rustjaw (rank 5+) opens the Wastes and lifts the caps: that is where the game opens up.
+   Mastery comes from kills, not hits, on a long 10-rank curve. Monsters notice you closer. */
+const V13_AGGRO=300,V13_LEASH=560;
+const V13_GATE_RANK=[4,6,8];                 // save.rank index needed to wake Gatekeeper 1/2/3 (rank 5 / 7 / 9)
+const V13_UPCAP=[5,7,9,10];                  // workshop level cap per open ring
+V13_LEVEL_XP.splice(0,V13_LEVEL_XP.length,0,500,1500,3500,7000,13000,22000,36000,60000,100000,160000);
+const v13RunNext=l=>Math.round(9*Math.pow(1.32,l-1));
+const v13UpCap=()=>V13_UPCAP[clamp(curReg(),0,3)];
+v13RewardXp=function(p,amt){
+  if(!p||!p.isP||!(amt>0))return;
+  const f=v13Family(p.wb),m=v13Mastery(p),old=v13Level(m[f]||0);
+  m[f]=Math.min(1000000,(m[f]||0)+amt);
+  const next=v13Level(m[f]);
+  if(p.remote&&mode==='host'){p.v13Mastery=m;p.v13MasteryDirty=true}
+  else{dirty=true;if(next!==old)persist()}
+  if(next!==old){
+    if(next===3)feedTo(p,`${f.toUpperCase()} mastery 3 · family technique unlocked`,'#f5c34d');
+    else if(next===6)feedTo(p,`${f.toUpperCase()} mastery 6 · stronger element effects`,'#f5c34d');
+    else if(next===10)bannerTo(p,`${f.toUpperCase()} MASTERY MAXED`,'Damage mastery capped at +12%',2.5);
+    else feedTo(p,`${f.toUpperCase()} mastery ${next}`,'#f5c34d');
+    recalc(p)
+  }
+};
+const _v13pHit=hitEnemy;
+hitEnemy=function(e,dmg,by,src,crit){
+  const alive=e&&!e.dead;if(e&&by&&by.isP)e.agT=4;
+  _v13pHit(e,dmg,by,src,crit);
+  if(alive&&e.dead&&by&&by.isP){const base=(e.xp||(ET[e.type]&&ET[e.type].xp)||1)*(e.elite?3:1)*(e.type==='boss'||e.gk||e.wb?5:1);v13RewardXp(by,Math.max(1,Math.round(base)))}
+};
+const _v13pUE=updateEnemies;
+updateEnemies=function(dt){for(const e of enemies)if(e.agT>0)e.agT-=dt;return _v13pUE(dt)};
+gainXp=function(p,n){const r=p.run;if(!r)return;if(!r.v13n){r.v13n=1;r.next=v13RunNext(r.lvl)}
+  r.xp+=n*(p.xpMul||1);while(r.xp>=r.next){r.xp-=r.next;r.lvl++;r.next=v13RunNext(r.lvl);p.pend.push(false);pev(p,'level',r.lvl)}tryPick(p)};
+const _v13pNewRun=newRun;
+newRun=function(p){_v13pNewRun(p);if(p.run){p.run.next=v13RunNext(1);p.run.v13n=1}};
+const _v13pBuy=buy;
+buy=function(k){if(save.lv[k]>=v13UpCap()){if(state!=='menu')feedTo(null,`Workshop cap LV ${v13UpCap()} · beat the next Gatekeeper to go further`,'#ed9b49');return}return _v13pBuy(k)};
+const _v13pGate=gateTick;
+gateTick=function(dt){for(const g of GATES){g.v13Lock=!g.open&&g.r===curReg()&&save.rank<V13_GATE_RANK[g.r];if(g.v13Lock)g.prog=-1e9}
+  _v13pGate(dt);
+  for(const g of GATES)if(g.v13Lock){g.prog=0;const on=players.some(p=>p.dead<=0&&Math.hypot(p.x-g.x,p.y-g.y)<120);
+    if(on&&!(g.v13Msg>time)){g.v13Msg=time+6;feedTo(null,`${REG[g.r+1].gk[0]} ignores you. Reach rank ${V13_GATE_RANK[g.r]+1} to wake it.`,REG[g.r+1].acc)}}};
+const _v13pOnGK=onGK;
+onGK=function(e,by){const first=!e.rep&&curReg()===e.gk-1;_v13pOnGK(e,by);
+  if(first&&e.gk===1)setTimeout(()=>bannerTo(null,'THE WASTES ARE OPEN','Past the Ditch the real run begins · workshop cap LV '+v13UpCap(),5),5600)};
+/* Rank goals that count things take longer; level, haul and upgrade goals stay as they are. */
+if(!RANKS.v13){RANKS.v13=1;for(let i=1;i<RANKS.length;i++)for(const gl of RANKS[i].g){if(MAXMODE.has(gl[0].split(':')[0]))continue;
+  const n=Math.max(gl[1]+1,Math.round(gl[1]*(i<5?2:1.5)));gl[2]=gl[2].replace(String(gl[1]),String(n));if(n===1)gl[2]=gl[2].replace(/s$/,'');gl[1]=n}}
+/* Saves from the first v0.13 slice earned mastery per hit: keep progress up to rank 3. */
+if(save.v13Migration===1){save.mastery=v13CleanMastery(save.mastery);for(const f of V13_FAMILIES)save.mastery[f]=Math.min(save.mastery[f],V13_LEVEL_XP[3]);save.v13Migration=2;persist()}
+if(window.__game)Object.assign(window.__game,{buy,gainXp,hitEnemy,v13pacing:{V13_AGGRO,V13_GATE_RANK,V13_UPCAP,table:V13_LEVEL_XP,runNext:v13RunNext,upCap:v13UpCap}});
 document.title='Salvage Run · v0.13';

@@ -93,7 +93,7 @@ function updateRivals(dt){
     if(target&&!rh&&r.cd<=0&&Math.hypot(target.x-r.x,target.y-r.y)<r.range){rivalFire(r,target);r.cd=1/r.rate}}}
 
 function updateEnemies(dt){
-  for(const p of players){if(p.dead>0)continue;const want=10+6*tierAt(p.x,p.y)+(p.glow?4:0)+Math.round(heat(p)*10)+Math.min(24,p.run.lvl);
+  for(const p of players){if(p.dead>0)continue;const want=8+5*tierAt(p.x,p.y)+(p.glow?3:0)+Math.round(heat(p)*8)+Math.min(16,Math.floor(p.run.lvl*.75));
     let n=0;for(const e of enemies)if(Math.abs(e.x-p.x)<1000&&Math.abs(e.y-p.y)<1000)n++;
     if(n<want&&Math.random()<dt*6)spawnEnemy(p)}
   for(const e of enemies){if(e.dead)continue;e.flash-=dt;e.hitCd-=dt;e.dashCd-=dt;e.sawCd-=dt;e.slamCd-=dt;
@@ -101,11 +101,11 @@ function updateEnemies(dt){
       if(!p||p.dead>0||inHub(p)){e.dead=true;fxRing(e.x,e.y,120,'#f6e7d8',.5);continue}
       const a=Math.atan2(p.y-e.y,p.x-e.x),sp=p.spd*(cloaked(p)?.4:.92);e.vx=Math.cos(a)*sp;e.vy=Math.sin(a)*sp;e.x+=e.vx*dt;e.y+=e.vy*dt;
       if(e.hitCd<=0&&!p.picking&&Math.hypot(p.x-e.x,p.y-e.y)<e.r+p.r){e.hitCd=.8;hitPlayer(p,p.maxHp*.35,e)}continue}
-    const boss=e.type==='boss',range=boss?700:450;let tgt=null,bd=range*range;
+    const boss=e.type==='boss',range=boss?(VLT?700:560):(VLT||(e.agT||0)>0?(VLT?450:560):V13_AGGRO);let tgt=null,bd=range*range;
     for(const p of players){if(!targetable(p))continue;const d=(p.x-e.x)**2+(p.y-e.y)**2;if(d<bd){bd=d;tgt=p}}
     for(const r of rivals){if(r.dead>0||inHub(r))continue;const d=(r.x-e.x)**2+(r.y-e.y)**2;if(d<bd){bd=d;tgt=r}}
     let sp=e.spd,ax=0,ay=0;
-    if(tgt){const a=Math.atan2(tgt.y-e.y,tgt.x-e.x);ax=Math.cos(a);ay=Math.sin(a);
+    if(tgt){e.agT=Math.max(e.agT||0,1.5);const a=Math.atan2(tgt.y-e.y,tgt.x-e.x);ax=Math.cos(a);ay=Math.sin(a);
       if(e.type==='dasher'){if(e.dash>0){e.dash-=dt;ax=e.dax;ay=e.day;sp*=3.4}else if(e.dashCd<=0&&bd<240*240){e.dash=.32;e.dashCd=rand(1.6,2.6);e.dax=ax;e.day=ay}}}
     else{const a=Math.atan2(e.wy-e.y,e.wx-e.x);ax=Math.cos(a);ay=Math.sin(a);sp*=.35;if(Math.hypot(e.wx-e.x,e.wy-e.y)<20){e.wx=e.x+rand(-200,200);e.wy=e.y+rand(-200,200)}}
     if(boss){if(e.slamT>0){e.slamT-=dt;sp=0;if(e.slamT<=0){fxRing(e.x,e.y,165,'#f5c34d',.4);shk(null,6);snd(null,60,.3,'sawtooth',.06,.5);

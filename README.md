@@ -120,7 +120,7 @@ Settings → Pages → Deploy from branch → `play` / root. `play` always holds
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), `q.js` (Combat Mastery), `r.js` (logo and icon set) and `s.js` (UI pass 2). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), `q.js` (Combat Mastery), `r.js` (logo and icon set), `s.js` (UI pass 2), and `t.js` (Settings). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
 - v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
@@ -129,6 +129,14 @@ Settings → Pages → Deploy from branch → `play` / root. `play` always holds
 - v0.13 screen-density pass: compacted the HUD, reduced duplicate split-screen notices, fitted banners, capped/merged damage numbers, and shortened repeated world labels. Ten staged scenes rendered from the real draw calls; measured canvas UI coverage fell from 54% to 18% in 4P phone landscape, from 32% to 19% in 2P split and from 28% to 12% in early solo portrait. Zero clipped HUD text in all ten frames. These are offline-render estimates, not real-device results; phone and 2-4 player couch checks remain open.
 - v0.13 UI pass: 23 screens (menu, all Base tabs, gear detail, odds, crew detail, level-up, pause, hub, gadgets, death, vault, Party split, results, online, lobby) in portrait 390×844 and landscape 844×390 in headless Chromium: 0 offscreen texts, 0 tap targets under 40 px, 0 old glyphs, 0 page errors. Real iOS/Android checks remain open.
 - v0.10 validation: 47 unit checks, frontier smoke test (gate, Gatekeeper, region unlock, wall, all 4 events, draw), 800-pick perk-cap check (0 capped offers), network, party, FFA, raid and weekly regressions passed; menu, Base tabs, hub bar, level-up and pause checked in portrait 390×844 and landscape 844×390. Tests use an internal harness not included in this static app. Human balance, real phones and physical controllers still need playtesting.
+
+## Settings (v0.13 · in progress)
+
+- Open from the menu or pause screen. Preferences save on this device.
+- Audio: master mute, sound-effects volume and music volume.
+- Comfort: screen shake, reduced hit flashes, and optional haptics where supported.
+- Field manual: touch, keyboard, gamepad and Party controls.
+- Reset progress requires a second confirmation and preserves device settings.
 
 ## Known limits
 

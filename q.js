@@ -263,7 +263,12 @@ const V13_AGGRO=300,V13_LEASH=560;
 const V13_GATE_RANK=[4,6,8];                 // save.rank index needed to wake Gatekeeper 1/2/3 (rank 5 / 7 / 9)
 const V13_UPCAP=[5,7,9,10];                  // workshop level cap per open ring
 V13_LEVEL_XP.splice(0,V13_LEVEL_XP.length,0,500,1500,3500,7000,13000,22000,36000,60000,100000,160000);
-const v13RunNext=l=>Math.round(9*Math.pow(1.32,l-1));
+/* Match modes (Party, Online free-for-all, co-op raids) are short sessions: they keep the fast arcade
+   run curve and the old monster density. Solo, vaults and co-op vaults use the grind curve. */
+const v13Match=()=>(mode==='party'||mode==='host'||mode==='guest')&&!(typeof coVaultActive!=='undefined'&&coVaultActive);
+const v13RunNext=l=>v13Match()?Math.round(5*Math.pow(1.3,l-1)):Math.round(9*Math.pow(1.32,l-1));
+const v13Want=p=>v13Match()?10+6*tierAt(p.x,p.y)+(p.glow?4:0)+Math.round(heat(p)*10)+Math.min(24,p.run.lvl)
+  :8+5*tierAt(p.x,p.y)+(p.glow?3:0)+Math.round(heat(p)*8)+Math.min(16,Math.floor(p.run.lvl*.75));
 const v13UpCap=()=>V13_UPCAP[clamp(curReg(),0,3)];
 v13RewardXp=function(p,amt){
   if(!p||!p.isP||!(amt>0))return;
@@ -284,14 +289,14 @@ const _v13pHit=hitEnemy;
 hitEnemy=function(e,dmg,by,src,crit){
   const alive=e&&!e.dead;if(e&&by&&by.isP)e.agT=4;
   _v13pHit(e,dmg,by,src,crit);
-  if(alive&&e.dead&&by&&by.isP){const base=(e.xp||(ET[e.type]&&ET[e.type].xp)||1)*(e.elite?3:1)*(e.type==='boss'||e.gk||e.wb?5:1);v13RewardXp(by,Math.max(1,Math.round(base)))}
+  if(alive&&e.dead&&by&&by.isP&&!(mode==='party'&&by.id!==0)){const base=(e.xp||(ET[e.type]&&ET[e.type].xp)||1)*(e.elite?3:1)*(e.type==='boss'||e.gk||e.wb?5:1);v13RewardXp(by,Math.max(1,Math.round(base)))}
 };
 const _v13pUE=updateEnemies;
 updateEnemies=function(dt){for(const e of enemies)if(e.agT>0)e.agT-=dt;return _v13pUE(dt)};
-gainXp=function(p,n){const r=p.run;if(!r)return;if(!r.v13n){r.v13n=1;r.next=v13RunNext(r.lvl)}
+gainXp=function(p,n){const r=p.run;if(!r)return;const mk=v13Match();if(!r.v13n||r.v13k!==mk){r.v13n=1;r.v13k=mk;r.next=v13RunNext(r.lvl)}
   r.xp+=n*(p.xpMul||1);while(r.xp>=r.next){r.xp-=r.next;r.lvl++;r.next=v13RunNext(r.lvl);p.pend.push(false);pev(p,'level',r.lvl)}tryPick(p)};
 const _v13pNewRun=newRun;
-newRun=function(p){_v13pNewRun(p);if(p.run){p.run.next=v13RunNext(1);p.run.v13n=1}};
+newRun=function(p){_v13pNewRun(p);if(p.run){p.run.next=v13RunNext(1);p.run.v13n=1;p.run.v13k=v13Match()}};
 const _v13pBuy=buy;
 buy=function(k){if(save.lv[k]>=v13UpCap()){if(state!=='menu')feedTo(null,`Workshop cap LV ${v13UpCap()} · beat the next Gatekeeper to go further`,'#ed9b49');return}return _v13pBuy(k)};
 const _v13pGate=gateTick;

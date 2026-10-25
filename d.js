@@ -93,7 +93,7 @@ function updateRivals(dt){
     if(target&&!rh&&r.cd<=0&&Math.hypot(target.x-r.x,target.y-r.y)<r.range){rivalFire(r,target);r.cd=1/r.rate}}}
 
 function updateEnemies(dt){
-  for(const p of players){if(p.dead>0)continue;const want=8+5*tierAt(p.x,p.y)+(p.glow?3:0)+Math.round(heat(p)*8)+Math.min(16,Math.floor(p.run.lvl*.75));
+  for(const p of players){if(p.dead>0)continue;const want=v13Want(p);
     let n=0;for(const e of enemies)if(Math.abs(e.x-p.x)<1000&&Math.abs(e.y-p.y)<1000)n++;
     if(n<want&&Math.random()<dt*6)spawnEnemy(p)}
   for(const e of enemies){if(e.dead)continue;e.flash-=dt;e.hitCd-=dt;e.dashCd-=dt;e.sawCd-=dt;e.slamCd-=dt;

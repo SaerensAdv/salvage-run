@@ -106,7 +106,7 @@ function beep(f,d=.06,type='square',v=.035,slide=0){if(!AC||muted)return;const t
   o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f*slide),t+d);
   g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02)}
 const fanfareLocal=(base=520)=>{[0,4,7,12].forEach((s,i)=>setTimeout(()=>beep(base*Math.pow(2,s/12),.14,'triangle',.05),i*80))};
-const vibLocal=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+let srHapticsEnabled=true;const vibLocal=p=>{try{srHapticsEnabled&&navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 /* procedural music: calm in the hub, layers stack with heat */
 const MUS={next:0,step:0,bpm:104,int:0};
 const BASS=[0,0,12,0,3,0,0,5,0,0,12,0,7,5,3,0];

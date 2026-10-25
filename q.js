@@ -254,3 +254,4 @@ const v13Base=$('base');if(v13Base)v13Base.addEventListener('click',v13HandleEle
 const v13Profile=$('prof');if(v13Profile)v13Profile.addEventListener('click',v13HandleElement);
 if(window.__game)Object.assign(window.__game,{v13:{families:V13_FAMILIES,elements:V13_ELEMENTS,migrate:v13Migrate,mastery:v13Mastery,level:v13Level,element:v13ElementOfItem,cycleElement:v13CycleElement}});
 v13RenderPanel();
+document.title='Salvage Run · v0.13';

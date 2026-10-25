@@ -108,3 +108,4 @@ function guestUpdate(dt){time+=dt;const k=Math.min(1,dt*12);
 window.__game={get players(){return players},get rivals(){return rivals},get enemies(){return enemies},get pickups(){return pickups},get state(){return state},get mode(){return mode},
   get beacon(){return beacon},crates,update,draw,save:()=>save,startSolo,startParty,endMatch,buy,ability,applyPick,openPause,closePause,keys,G,
   setHeat:(p,v)=>{p.trip.t=v},netHost,netJoin,netTick,guestUpdate,backToMenu,get matchT(){return matchT},set matchT(v){matchT=v},lobbyStart:()=>$('lobbyStart').click()};
+

@@ -143,9 +143,9 @@ const _uen10=updateEnemies;updateEnemies=function(dt){const prev=new Map();if(!V
         const dh=Math.hypot(pp[0]-HUB.x,pp[1]-HUB.y);if(dh>fr-260){fx+=(HUB.x-pp[0])/dh*1.5;fy+=(HUB.y-pp[1])/dh*1.5}const m=Math.hypot(fx,fy)||1;
         e.x=pp[0]+fx/m*e.spd*dt;e.y=pp[1]+fy/m*e.spd*dt;e.vx=fx/m*e.spd;e.vy=fy/m*e.spd}}
     if(e.gk)gkTick(e,dt);
-    const d=Math.hypot(e.x-HUB.x,e.y-HUB.y);if(d>fr-e.r){e.x=HUB.x+(e.x-HUB.x)/d*(fr-e.r);e.y=HUB.y+(e.y-HUB.y)/d*(fr-e.r)}}};
+    const d=Math.hypot(e.x-HUB.x,e.y-HUB.y);if(d>fr-e.r&&!(typeof pocketHold==='function'&&pocketHold(e))){e.x=HUB.x+(e.x-HUB.x)/d*(fr-e.r);e.y=HUB.y+(e.y-HUB.y)/d*(fr-e.r)}}};
 const _upl10=updatePlayer;updatePlayer=function(p,dt){_upl10(p,dt);if(VLT||p.dead>0)return;const fr=FR(),d=Math.hypot(p.x-HUB.x,p.y-HUB.y);
-  if(d>fr-p.r){p.x=HUB.x+(p.x-HUB.x)/d*(fr-p.r);p.y=HUB.y+(p.y-HUB.y)/d*(fr-p.r);if(!(p.wallT>0)&&curReg()<3){p.wallT=4;feedTo(p,`Locked. Beat ${REG[curReg()+1].gk[0]} at the gate to go further.`,'#ff6a3d')}}
+  if(d>fr-p.r&&!(typeof pocketHold==='function'&&pocketHold(p))){p.x=HUB.x+(p.x-HUB.x)/d*(fr-p.r);p.y=HUB.y+(p.y-HUB.y)/d*(fr-p.r);if(!(p.wallT>0)&&curReg()<3){p.wallT=4;feedTo(p,`Locked. Beat ${REG[curReg()+1].gk[0]} at the gate to go further.`,'#ff6a3d')}}
   p.wallT=(p.wallT||0)-dt;const r=regAt(p.x,p.y);if(p.lastReg!=null&&r!==p.lastReg&&r>0&&!p.remote)bannerTo(p,REG[r].n.toUpperCase(),`Monsters ×${RSC[r].hp.toFixed(1)} tougher · scrap ×${RSC[r].sc.toFixed(1)} · gear +${4*r} iLvl`,2.2);p.lastReg=r};
 const _uw10=updateWorld;updateWorld=function(dt){_uw10(dt);for(let i=crates.length-1;i>=0;i--){const c=crates[i];if((c.camp!=null||c.evc)&&c.dead>0)crates.splice(i,1)}
   if(VLT||ftueOn())return;gateTick(dt);campTick(dt);shrineTick(dt);evTick(dt);hazTick(dt)};

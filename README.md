@@ -96,7 +96,7 @@ Grab scrap. Get out alive. Bank it before someone takes it.
 - **Gear:** stash tiles show the item icon, a rarity letter (C U R E L S), IP and E/▲ badges. Hot items get a flame and a HOT note in the details. The HUD shows a small HOT chip next to the vital panel.
 - **Base:** tabs with icons on one row, panels scroll so every button stays reachable in landscape. The hub bar fits on a phone and moves up in split screen. In-game buttons hide behind Pause, Pick and Base.
 
-## Companions & gadgets (v0.9)
+<h2>Map slice 1 · feature-branch test</h2><p><strong>Events:</strong> 19 fixed sites now anchor drops, hordes and storms to landmarks. The goblin stays near the player.</p><p><strong>Relay Core contract:</strong> Clear guards, hold the relay for 1.6 s, carry the hot core to the hub or an open outpost. Death drops it; carrying it draws PKers and additional monsters in the Wastes.</p><p><strong>Optional cache:</strong> Opening it triggers a 3 s horde warning. Clear the wave for a chest and +50% contract payout when banking the core.</p><p><strong>Corner pockets:</strong> Four Wastes 50 destinations open after Core Tyrant, each with a guarded deep cache. No new currency, game mode or save field. Host-authoritative, with relay and pocket state synced to guests.</p><p><strong>QA:</strong> 36 slice, 8 online, 14 pacing, 11 workshop UI, 20 Wastes and 6 network checks passed; portrait and landscape checked at 390×844, 844×390 and 320×640. Human balance and device testing remain open.</p><h2>Companions & gadgets (v0.9)</h2>
 
 - **One companion** (Base → Crew). Unlocks at rank 2, the Turret drone is free; others cost 120 safe scrap. Feed them scrap (and cores from Lv 4) up to Lv 10.
 - **Drones** float and never die: Turret (shoots), Medic (heals out of combat), Magnet (pulls scrap), Aegis (blocks a hit every few seconds), Scout (arrows to elites, chests, rifts, +scrap).
@@ -120,7 +120,7 @@ Settings → Pages → Deploy from branch → `play` / root. `play` always holds
 ## Development & QA
 
 - Static HTML, canvas and JavaScript PWA. No package install or build step: keep the shipped files together; open `index.html` locally or serve the folder over HTTPS for install/offline support.
-- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), `q.js` (Combat Mastery), `r.js` (logo and icon set), `s.js` (UI pass 2), and `t.js` (Settings). Keep game logic separate from drawing so a later visual remake can reuse it.
+- Script order is intentional: `config.js`, then `a.js`–`k.js`, then `l.js` (companions and gadgets), `m.js` (frontier), `n.js` (UI shell), `o.js` (co-op vaults), `p.js` (The Wastes), `q.js` (Combat Mastery), `r.js` (logo and icon set), `s.js` (UI pass 2), and `t.js` (Settings), and `u.js` (map slice 1: event sites, Relay Core, corner pockets). Keep game logic separate from drawing so a later visual remake can reuse it.
 - `sw.js` owns the offline cache. Bump its cache name for each release and add every new runtime file to `FILES`.
 - Optional TURN credentials belong in `config.js` as `window.SALVAGE_ICE`; leave it `null` when unused and never commit real credentials.
 - v0.11 validation: 11 co-op vault unit checks (start, regroup gate, Mimic guards, downed respawn, team extract), host/guest vault sync incl. Mimic guards and guest payout, plus v0.10 unit, smoke, vault, network, party, raid and weekly regressions; Party screen checked in portrait and landscape.
